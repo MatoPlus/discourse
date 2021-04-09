@@ -12,6 +12,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
     "argon2": "^0.27.2",
     "cors": "^2.8.5",
     "dotenv-safe": "^8.2.0",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.10",
     "@types/express": "^4.17.11",
+    "@types/hapi__joi": "^17.1.6",
     "@types/jsonwebtoken": "^8.5.1",
     "@types/node": "^14.14.37",
     "nodemon": "^2.0.7",

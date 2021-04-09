@@ -4,9 +4,20 @@ import UserDocument from "../types/UserDocument";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import FieldError from "../entities/FieldError";
-import AuthRequest from "../types/AuthRequest";
+import AuthRequest from "src/types/AuthRequest";
+
+import { registerSchema } from "../schemas/schema";
 
 export const registerUser = async (req: Request, res: Response) => {
+  const { error } = registerSchema.validate(req.body);
+  if (error) {
+    return res.status(409).json({
+      errors: error.details.map(
+        (detail) => new FieldError(detail.path[0] as string, detail.message)
+      ),
+    });
+  }
+
   try {
     const user: UserDocument = new User({
       username: req.body.username,
@@ -14,15 +25,21 @@ export const registerUser = async (req: Request, res: Response) => {
       hashedPassword: await argon2.hash(req.body.password),
     });
     await user.save();
-    res.status(201).json(user);
+    return res.status(201).json(user);
   } catch (err) {
-    res.status(409).json({ message: err.message });
+    if (err.code === 11000) {
+      // duplicate error
+      const field = Object.keys(err.keyPattern)[0] as string;
+      return res.status(409).json({
+        errors: [new FieldError(field, `${field} is already taken`)],
+      });
+    } else {
+      return res.status(409).json({ message: "Cannot register invalid user" });
+    }
   }
 };
 
 export const loginUser = async (req: Request, res: Response) => {
-  console.log(req.body);
-
   const user = await User.findOne({
     $or: [
       { email: req.body.usernameOrEmail },
@@ -30,13 +47,17 @@ export const loginUser = async (req: Request, res: Response) => {
     ],
   });
   if (!user)
-    return res
-      .status(400)
-      .send(new FieldError("usernameOrEmail", "Username or email not found"));
+    return res.status(400).json({
+      errors: [
+        new FieldError("usernameOrEmail", "Username or email not found"),
+      ],
+    });
 
   const validPass = await argon2.verify(user.hashedPassword, req.body.password);
   if (!validPass)
-    return res.status(400).send(new FieldError("password", "Invalid password"));
+    return res
+      .status(400)
+      .json({ errors: [new FieldError("password", "Invalid password")] });
 
   // token assigning
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
@@ -47,6 +68,6 @@ export const currentUser = async (req: AuthRequest, res: Response) => {
   if (!req.user) {
     res.status(401).json({ message: "Not logged in" });
   } else {
-    res.status(201).json(req.user);
+    res.status(201).json(req.body.user);
   }
 };
