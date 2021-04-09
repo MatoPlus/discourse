@@ -5,14 +5,17 @@ import { registerUser } from "../api/users";
 import { Container } from "../components/Container";
 import { DarkModeSwitch } from "../components/DarkModeSwitch";
 import { InputField } from "../components/InputField";
+import { getErrorMap } from "../utils/getErrorMap";
 
 const Register = () => (
   <Container height="100vh">
     <Box m="auto">
       <Formik
         initialValues={{ username: "", email: "", password: "" }}
-        onSubmit={async (values) => {
-          await registerUser(values);
+        onSubmit={(values, { setErrors }) => {
+          registerUser(values).catch((err) => {
+            setErrors(getErrorMap(err.response.data.errors));
+          });
         }}
       >
         <Form>

@@ -6,14 +6,17 @@ import { DarkModeSwitch } from "../components/DarkModeSwitch";
 import { InputField } from "../components/InputField";
 import Link from "next/link";
 import { loginUser } from "../api/users";
+import { getErrorMap } from "../utils/getErrorMap";
 
 const Login = () => (
   <Container height="100vh">
     <Box m="auto">
       <Formik
         initialValues={{ usernameOrEmail: "", password: "" }}
-        onSubmit={(values) => {
-          loginUser(values);
+        onSubmit={(values, { setErrors }) => {
+          loginUser(values).catch((err) => {
+            setErrors(getErrorMap(err.response.data.errors));
+          });
         }}
       >
         <Form>
