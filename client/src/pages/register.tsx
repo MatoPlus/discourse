@@ -1,9 +1,8 @@
 import { Button } from "@chakra-ui/button";
 import { Box } from "@chakra-ui/layout";
 import { Form, Formik } from "formik";
-import { registerUser } from "../api/users";
+import { registerUser } from "../api/routes/users";
 import { Container } from "../components/Container";
-import { DarkModeSwitch } from "../components/DarkModeSwitch";
 import { InputField } from "../components/InputField";
 import { getErrorMap } from "../utils/getErrorMap";
 
@@ -37,7 +36,6 @@ const Register = () => (
         </Form>
       </Formik>
     </Box>
-    <DarkModeSwitch />
   </Container>
 );
 

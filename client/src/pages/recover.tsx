@@ -2,7 +2,6 @@ import { Button } from "@chakra-ui/button";
 import { Box } from "@chakra-ui/layout";
 import { Form, Formik } from "formik";
 import { Container } from "../components/Container";
-import { DarkModeSwitch } from "../components/DarkModeSwitch";
 import { InputField } from "../components/InputField";
 
 const Recover = () => (
@@ -33,7 +32,6 @@ const Recover = () => (
         </Form>
       </Formik>
     </Box>
-    <DarkModeSwitch />
   </Container>
 );
 

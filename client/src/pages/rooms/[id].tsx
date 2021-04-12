@@ -2,8 +2,7 @@ import { Box, Heading } from "@chakra-ui/layout";
 import { Container } from "next/app";
 import React from "react";
 import { RoomProps } from ".";
-import { fetchRoom } from "../../api/rooms";
-import { DarkModeSwitch } from "../../components/DarkModeSwitch";
+import { fetchRoom } from "../../api/routes/rooms";
 import Editor from "@monaco-editor/react";
 
 export async function getServerSideProps(context: any) {
@@ -21,7 +20,6 @@ const Room = ({ room }: { room: RoomProps }) => {
     return (
       <Container height="100vh">
         <Box>could not find post</Box>
-        <DarkModeSwitch />
       </Container>
     );
   }
@@ -30,7 +28,6 @@ const Room = ({ room }: { room: RoomProps }) => {
     <Container height="100vh">
       <Heading mb={4}>{room.name}</Heading>
       <Editor height="75vh" defaultLanguage="javascript" theme={"vs-dark"} />
-      <DarkModeSwitch />
     </Container>
   );
 };

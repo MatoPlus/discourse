@@ -1,7 +1,6 @@
 import { Container } from "../../components/Container";
-import { DarkModeSwitch } from "../../components/DarkModeSwitch";
 import { Hero } from "../../components/Hero";
-import { fetchRooms } from "../../api/rooms";
+import { fetchRooms } from "../../api/routes/rooms";
 import { Table, Tbody, Th, Thead, Tr, Td } from "@chakra-ui/table";
 import React, { useMemo } from "react";
 import { useTable, useSortBy, Column } from "react-table";
@@ -21,14 +20,12 @@ export async function getServerSideProps(_: any) {
   const { data } = await fetchRooms();
   return {
     props: {
-      rooms: data,
+      rooms: data.rooms,
     },
   };
 }
 
 const Room = ({ rooms }: { rooms: [RoomProps] }) => {
-  console.log("rooms", rooms);
-
   const data = useMemo<RoomProps[]>(() => [...rooms], []);
   const columns = useMemo<Column<RoomProps>[]>(
     () => [
@@ -60,7 +57,6 @@ const Room = ({ rooms }: { rooms: [RoomProps] }) => {
   return (
     <Container height="100vh">
       <Hero title={"Rooms"} />
-      <DarkModeSwitch />
       <Table {...getTableProps()}>
         <Thead>
           {headerGroups.map((headerGroup) => (

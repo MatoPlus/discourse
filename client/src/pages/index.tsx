@@ -11,7 +11,6 @@ import { CheckCircleIcon, LinkIcon } from "@chakra-ui/icons";
 import { Hero } from "../components/Hero";
 import { Container } from "../components/Container";
 import { Main } from "../components/Main";
-import { DarkModeSwitch } from "../components/DarkModeSwitch";
 import { Footer } from "../components/Footer";
 
 const Index = () => (
@@ -44,7 +43,6 @@ const Index = () => (
       </List>
     </Main>
 
-    <DarkModeSwitch />
     <Footer>
       <Text>- Terms and Conditions -</Text>
     </Footer>
