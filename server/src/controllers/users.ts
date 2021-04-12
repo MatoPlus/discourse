@@ -2,11 +2,12 @@ import { Request, Response } from "express";
 import User from "../models/user";
 import UserDocument from "../types/UserDocument";
 import argon2 from "argon2";
-import jwt from "jsonwebtoken";
 import FieldError from "../entities/FieldError";
-import AuthRequest from "src/types/AuthRequest";
+import AuthRequest from "../types/AuthRequest";
+import { sendRefreshToken } from "../utils/response";
 
 import { registerSchema } from "../schemas/schema";
+import { createAccessToken, createRefreshToken } from "../utils/tokens";
 
 export const registerUser = async (req: Request, res: Response) => {
   const { error } = registerSchema.validate(req.body);
@@ -34,7 +35,7 @@ export const registerUser = async (req: Request, res: Response) => {
         errors: [new FieldError(field, `${field} is already taken`)],
       });
     } else {
-      return res.status(409).json({ message: "Cannot register invalid user" });
+      return res.status(400).json({ message: "Cannot register invalid user" });
     }
   }
 };
@@ -60,14 +61,28 @@ export const loginUser = async (req: Request, res: Response) => {
       .json({ errors: [new FieldError("password", "Invalid password")] });
 
   // token assigning
-  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-  return res.header("auth-token", token).send({ token: token });
+  const accessToken = createAccessToken(user);
+
+  sendRefreshToken(res, createRefreshToken(user));
+
+  return res.send({ token: accessToken });
+};
+
+export const logoutUser = async (_: Request, res: Response) => {
+  sendRefreshToken(res, "");
+  res.json({ ok: true });
 };
 
 export const currentUser = async (req: AuthRequest, res: Response) => {
   if (!req.user) {
-    res.status(401).json({ message: "Not logged in" });
-  } else {
-    res.status(201).json(req.body.user);
+    return res.status(401).json({ message: "Not logged in" });
   }
+
+  const user = await User.findOne({ _id: (req.user as any)._id });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  return res
+    .status(200)
+    .json({ _id: user._id, username: user.username, email: user.email });
 };

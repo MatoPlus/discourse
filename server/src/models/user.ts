@@ -25,6 +25,11 @@ const userSchema: Schema = new mongoose.Schema(
       trim: true,
       minlength: 6,
     },
+    refreshTokenWatermark: {
+      type: Date,
+      default: Date.now,
+      required: true,
+    },
   },
   {
     timestamps: true,
