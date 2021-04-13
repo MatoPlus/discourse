@@ -8,6 +8,7 @@ import { chakra } from "@chakra-ui/system";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { Link as ChakraLink } from "@chakra-ui/layout";
+import { Button } from "@chakra-ui/button";
 
 export interface RoomProps {
   name: string;
@@ -57,6 +58,11 @@ const Room = ({ rooms }: { rooms: [RoomProps] }) => {
   return (
     <Container height="100vh">
       <Hero title={"Rooms"} />
+      <Link href="/rooms/create">
+        <Button mb={2} as={ChakraLink} colorScheme="teal">
+          create room
+        </Button>
+      </Link>
       <Table {...getTableProps()}>
         <Thead>
           {headerGroups.map((headerGroup) => (
