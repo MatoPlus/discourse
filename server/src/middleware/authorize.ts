@@ -8,8 +8,7 @@ export default function authorize(
   next: NextFunction
 ) {
   const authorization = req.header("authorization");
-  if (!authorization)
-    res.status(401).send({ message: "Access Denied, Please Login" });
+  if (!authorization) res.status(200).send({ message: "User not logged in" });
   else {
     try {
       // Following the bearer scheme
