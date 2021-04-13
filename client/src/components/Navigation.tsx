@@ -6,24 +6,22 @@ import { fetchMe, logoutUser } from "../api/routes/users";
 import { setAccessToken } from "../accessToken";
 import { DarkModeSwitch } from "./DarkModeSwitch";
 
-export const Navigation = () => {
+export const Navigation = ({ bg }: { bg: string }) => {
   const queryClient = useQueryClient();
-  const { isLoading, isError, data } = useQuery("me", fetchMe);
+  const { data } = useQuery("me", fetchMe);
 
-  let body = null;
+  let body = (
+    <>
+      <Link href="/login">
+        <ChakraLink mr={2}>login</ChakraLink>
+      </Link>
+      <Link href="/register">
+        <ChakraLink mr={4}>register</ChakraLink>
+      </Link>
+    </>
+  );
 
-  if (isLoading || isError || !data) {
-    body = (
-      <>
-        <Link href="/login">
-          <ChakraLink mr={2}>login</ChakraLink>
-        </Link>
-        <Link href="/register">
-          <ChakraLink mr={2}>register</ChakraLink>
-        </Link>
-      </>
-    );
-  } else if (data) {
+  if (data && data.data.username) {
     body = (
       <>
         <Box mr={2}>{(data as any).data.username}</Box>
@@ -43,7 +41,7 @@ export const Navigation = () => {
   }
 
   return (
-    <Flex zIndex={1} position="sticky" top={0} p={3}>
+    <Flex zIndex={1} position="sticky" top={0} p={3} bg={bg}>
       <Flex flex={1} m="auto" align="center" maxW={800}>
         <Link href="/">
           <ChakraLink>
