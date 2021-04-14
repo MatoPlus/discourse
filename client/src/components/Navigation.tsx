@@ -21,10 +21,10 @@ export const Navigation = ({ bg }: { bg: string }) => {
     </>
   );
 
-  if (data && data.data.username) {
+  if (data?.data.username) {
     body = (
       <>
-        <Box mr={2}>{(data as any).data.username}</Box>
+        <Box mr={2}>{data.data.username}</Box>
         <Button
           onClick={async () => {
             await logoutUser();
