@@ -17,7 +17,11 @@ const CreateRoom = () => {
         <Formik
           initialValues={{ name: "", maxUsers: 1, password: "" }}
           onSubmit={async (values, { setErrors }) => {
-            const response = await createRoom(values).catch((err) => {
+            const { password, ...restValues } = values;
+            const response = await createRoom({
+              password: password.length > 0 ? password : undefined,
+              ...restValues,
+            }).catch((err) => {
               setErrors(getErrorMap(err.response.data.errors));
             });
             if (response && response.data) {

@@ -10,5 +10,5 @@ export const fetchRoom = (id: string) =>
 export const createRoom = (room: {
   name: string;
   maxUsers: number;
-  password: string;
+  password?: string;
 }) => axios.post(path, room);
