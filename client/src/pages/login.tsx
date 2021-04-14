@@ -21,7 +21,6 @@ const Login = () => {
             const response = await loginUser(values).catch((err) => {
               setErrors(getErrorMap(err.response.data.errors));
             });
-
             if (response && response.data) {
               setAccessToken(response.data.token);
               router.push("/");

@@ -1,5 +1,5 @@
 import React, { InputHTMLAttributes } from "react";
-import { useField } from "formik";
+import { useField, useFormikContext } from "formik";
 import { Input } from "@chakra-ui/input";
 import { Textarea } from "@chakra-ui/textarea";
 import {
@@ -28,6 +28,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   ...props
 }) => {
   const [field, { error }] = useField(props);
+  const form = useFormikContext();
 
   let body = <Input {...field} {...props} id={field.name} />;
 
@@ -35,7 +36,12 @@ export const InputField: React.FC<InputFieldProps> = ({
     body = <Textarea {...field} name={props.name} id={field.name} />;
   } else if (inputType === "number") {
     body = (
-      <NumberInput {...field} {...(props as NumberInputProps)} id={field.name}>
+      <NumberInput
+        {...field}
+        {...(props as NumberInputProps)}
+        id={field.name}
+        onChange={(val) => form.setFieldValue(field.name, val)}
+      >
         <NumberInputField />
         <NumberInputStepper>
           <NumberIncrementStepper />
