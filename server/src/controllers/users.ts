@@ -6,11 +6,11 @@ import FieldError from "../entities/FieldError";
 import AuthRequest from "../types/AuthRequest";
 import { sendRefreshToken } from "../utils/response";
 
-import { registerSchema } from "../schemas/schema";
+import { registerUserSchema } from "../schemas/schema";
 import { createAccessToken, createRefreshToken } from "../utils/tokens";
 
 export const registerUser = async (req: Request, res: Response) => {
-  const { error } = registerSchema.validate(req.body);
+  const { error } = registerUserSchema.validate(req.body);
   if (error) {
     return res.status(409).json({
       errors: error.details.map(
