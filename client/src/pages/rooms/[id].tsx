@@ -1,5 +1,5 @@
 import { Box, Heading } from "@chakra-ui/layout";
-import { Container } from "next/app";
+import { Container } from "../../components/Container";
 import React from "react";
 import { RoomProps } from ".";
 import { fetchRoom } from "../../api/routes/rooms";
@@ -26,7 +26,9 @@ const Room = ({ room }: { room: RoomProps }) => {
 
   return (
     <Container height="100vh">
-      <Heading mb={4}>{room.name}</Heading>
+      <Heading mt={2} mb={2} size="lg">
+        {room.name}
+      </Heading>
       <Editor height="75vh" defaultLanguage="javascript" theme={"vs-dark"} />
     </Container>
   );
