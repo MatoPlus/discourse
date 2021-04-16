@@ -17,19 +17,43 @@ export const getRooms = async (_: Request, res: Response) => {
 };
 
 export const getRoom = async (req: Request, res: Response) => {
+  const room = await Room.findOne({ _id: req.params.id });
+
+  // TODO: Handle passwords
+  if (!room) {
+    return res
+      .status(404)
+      .json({ errors: [new FieldError("_id", "Room not found")] });
+  }
+
+  return res.json(room || {});
+};
+
+export const enterRoom = async (req: AuthRequest, res: Response) => {
   try {
-    const room = await Room.findOne({ _id: req.params.id });
-    res.json(room || {});
+    await Room.findOneAndUpdate(
+      { _id: req.body.id },
+      { $push: { currentUsers: { userId: (req.user as any)._id } } }
+    );
+    return res.json(req.user);
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    return res.status(404).json({ message: "Invalid room id" });
+  }
+};
+
+export const leaveRoom = async (req: AuthRequest, res: Response) => {
+  try {
+    await Room.findOneAndUpdate(
+      { _id: req.body.id },
+      { $pull: { currentUsers: { userId: (req.user as any)._id } } }
+    );
+    return res.json(req.user);
+  } catch (err) {
+    return res.status(404).json({ message: "Invalid room id" });
   }
 };
 
 export const createRoom = async (req: AuthRequest, res: Response) => {
-  if (!req.user) {
-    return res.json({ message: "Not logged in" });
-  }
-
   const { error } = createRoomSchema.validate(req.body);
   if (error) {
     return res.status(409).json({

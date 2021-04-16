@@ -1,7 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import RoomDocument from "../types/RoomDocument";
 
-// TODO: Try to replace constraints with Joi validation
 // Missing text and language setting
 const roomSchema: Schema = new mongoose.Schema(
   {
@@ -17,10 +16,15 @@ const roomSchema: Schema = new mongoose.Schema(
       minlength: 1,
       maxlength: 32,
     },
-    maxUsers: { type: Number, required: true, min: 1, max: 32 },
     hashedPassword: {
       type: String,
       trim: true,
+    },
+    maxUsers: { type: Number, required: true, min: 1, max: 32 },
+    currentUsers: {
+      type: [{ userId: { type: String } }],
+      required: true,
+      default: [],
     },
   },
   {
