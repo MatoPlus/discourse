@@ -74,10 +74,6 @@ export const logoutUser = async (_: Request, res: Response) => {
 };
 
 export const currentUser = async (req: AuthRequest, res: Response) => {
-  if (!req.user) {
-    return res.json({ message: "Not logged in" });
-  }
-
   const user = await User.findOne({ _id: (req.user as any)._id });
   if (!user) {
     return res.status(404).json({ message: "User not found" });
