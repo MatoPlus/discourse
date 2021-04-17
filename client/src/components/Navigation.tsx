@@ -6,7 +6,13 @@ import { fetchMe, logoutUser } from "../api/routes/users";
 import { setAccessToken } from "../accessToken";
 import { DarkModeSwitch } from "./DarkModeSwitch";
 
-export const Navigation = ({ bg }: { bg: string }) => {
+export const Navigation = ({
+  bg,
+  disableSticky,
+}: {
+  bg: string;
+  disableSticky: boolean;
+}) => {
   const queryClient = useQueryClient();
   const { data } = useQuery("me", fetchMe);
 
@@ -41,7 +47,13 @@ export const Navigation = ({ bg }: { bg: string }) => {
   }
 
   return (
-    <Flex zIndex={1} position="sticky" top={0} p={3} bg={bg}>
+    <Flex
+      zIndex={1}
+      position={disableSticky ? undefined : "sticky"}
+      top={0}
+      p={3}
+      bg={bg}
+    >
       <Flex flex={1} m="auto" align="center" maxW={800}>
         <Link href="/">
           <ChakraLink>

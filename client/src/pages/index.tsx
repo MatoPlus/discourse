@@ -18,8 +18,8 @@ const Index = () => (
     <Hero title={"discourse"} />
     <Main>
       <Text>
-        Better codepile made with <Code>Next.js</Code> + <Code>chakra-ui</Code>{" "}
-        + <Code>typescript</Code>.
+        Create and code together with discourse. Made with <Code>Next.js</Code>{" "}
+        + <Code>chakra-ui</Code> + <Code>typescript</Code>.
       </Text>
 
       <List spacing={3} my={0}>

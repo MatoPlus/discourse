@@ -6,6 +6,7 @@ import { refreshAccessToken } from "../api/routes/auth";
 import { useEffect } from "react";
 import { setAccessToken } from "../accessToken";
 import { QueryClient, QueryClientProvider } from "react-query";
+import "../styles/codemirror.css";
 
 const queryClient = new QueryClient();
 
