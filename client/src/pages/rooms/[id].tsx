@@ -1,13 +1,15 @@
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/solarized.css";
+import { io, Socket } from "socket.io-client";
 import { Box, Heading } from "@chakra-ui/layout";
 import { Container } from "../../components/Container";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { RoomProps } from ".";
 import { fetchRoom } from "../../api/routes/rooms";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import { useColorMode } from "@chakra-ui/color-mode";
 import { Select } from "@chakra-ui/select";
+import { DefaultEventsMap } from "socket.io-client/build/typed-events";
 
 // A workaround for SSR
 if (typeof window !== "undefined" && typeof window.navigator !== "undefined") {
@@ -38,17 +40,39 @@ const Room = ({ room }: { room: RoomProps }) => {
     );
   }
 
+  const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap>>();
   const { colorMode } = useColorMode();
   const [code, setCode] = useState({ value: "" });
   const [indent, setIndent] = useState(4);
   const [language, setLanguage] = useState("javascript");
   const [keybinding, setKeybinding] = useState("default");
 
+  useEffect(() => {
+    socketRef.current = io(process.env.NEXT_PUBLIC_API_URL as string, {
+      query: { roomId: room._id },
+    });
+    socketRef.current.on("code edit", (value) => {
+      setCode({ value });
+    });
+    socketRef.current.on("setting edit language", (language) => {
+      setLanguage(language);
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
+
   return (
     <Container height="100%" disableStickyNav>
       <Box width="100%" padding={5}>
         <CodeMirror
           onBeforeChange={(editor, data, value) => {
+            if (socketRef.current) {
+              socketRef.current.emit("code edit", value);
+            }
             setCode({ value });
           }}
           value={code.value}
@@ -71,7 +95,13 @@ const Room = ({ room }: { room: RoomProps }) => {
         width={150}
         name="language"
         value={language}
-        onChange={(event) => setLanguage(event.target.value)}
+        onChange={(event) => {
+          let newLanguage = event.target.value;
+          setLanguage(newLanguage);
+          if (socketRef.current) {
+            socketRef.current.emit("setting edit language", newLanguage);
+          }
+        }}
       >
         <option value="javascript">javascript</option>
         <option value="xml">xml</option>
