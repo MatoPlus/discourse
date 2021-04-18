@@ -4,5 +4,6 @@ declare namespace NodeJS {
     PORT: string;
     ACCESS_JWT_SECRET: string;
     REFRESH_JWT_SECRET: string;
+    CORS_ORIGIN: string;
   }
 }

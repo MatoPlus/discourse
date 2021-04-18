@@ -6,13 +6,38 @@ import roomRoutes from "./routes/rooms";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
 import cookieParser from "cookie-parser";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 const main = async () => {
   const app = express();
+  const httpServer = createServer(app);
+  const io = new Server(httpServer, {
+    cors: {
+      origin: process.env.CORS_ORIGIN,
+    },
+  });
+
+  io.on("connection", (socket) => {
+    console.log("a user has connected");
+
+    socket.on("code edit", (value) => {
+      socket.broadcast.emit("code edit", value);
+    });
+
+    socket.on("setting edit language", (language) => {
+      socket.broadcast.emit("setting edit language", language);
+    });
+
+    // TODO: Add count down to disconnect sockets when no user in room
+    socket.on("disconnect", () => {
+      console.log("user disconnected");
+    });
+  });
 
   app.use(
     cors({
-      origin: "http://localhost:3000",
+      origin: process.env.CORS_ORIGIN,
       credentials: true,
     })
   );
@@ -30,7 +55,7 @@ const main = async () => {
   });
   mongoose.set("useFindAndModify", false);
 
-  app.listen(process.env.PORT, () =>
+  httpServer.listen(process.env.PORT, () =>
     console.log(`Server running on port: ${process.env.PORT}`)
   );
 };
