@@ -21,12 +21,18 @@ const main = async () => {
   io.on("connection", (socket) => {
     console.log("a user has connected");
 
+    // Join a code room
+    const { roomId } = socket.handshake.query;
+    socket.join(roomId as string);
+
     socket.on("code edit", (value) => {
-      socket.broadcast.emit("code edit", value);
+      socket.broadcast.to(roomId as string).emit("code edit", value);
     });
 
     socket.on("setting edit language", (language) => {
-      socket.broadcast.emit("setting edit language", language);
+      socket.broadcast
+        .to(roomId as string)
+        .emit("setting edit language", language);
     });
 
     // TODO: Add count down to disconnect sockets when no user in room
