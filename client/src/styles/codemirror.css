@@ -1,4 +1,4 @@
 .CodeMirror {
   resize: vertical;
-  height: 75vh !important;
+  min-height: 75vh !important;
 }
