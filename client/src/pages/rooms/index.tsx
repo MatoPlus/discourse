@@ -16,6 +16,9 @@ export interface RoomProps {
   name: string;
   host: string;
   maxUsers: number;
+  currentUsers: [{ userId: string }];
+  content: string;
+  mode: string;
   _id: string;
 }
 

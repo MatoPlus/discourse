@@ -26,6 +26,14 @@ const roomSchema: Schema = new mongoose.Schema(
       required: true,
       default: [],
     },
+    content: {
+      type: String,
+      default: "",
+    },
+    mode: {
+      type: String,
+      default: "javascript",
+    },
   },
   {
     timestamps: true,

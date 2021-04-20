@@ -42,9 +42,9 @@ const Room = ({ room }: { room: RoomProps }) => {
 
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap>>();
   const { colorMode } = useColorMode();
-  const [code, setCode] = useState({ value: "" });
+  const [code, setCode] = useState({ value: room.content });
   const [indent, setIndent] = useState(4);
-  const [language, setLanguage] = useState("javascript");
+  const [language, setLanguage] = useState(room.mode);
   const [keybinding, setKeybinding] = useState("default");
 
   useEffect(() => {

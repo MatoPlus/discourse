@@ -6,4 +6,6 @@ export default interface RoomDocument extends Document {
   hashedPassword?: string;
   maxUsers: number;
   currentUsers: [{ userId: string }];
+  content: string;
+  mode: string;
 }

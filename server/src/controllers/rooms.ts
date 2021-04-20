@@ -19,7 +19,6 @@ export const getRooms = async (_: Request, res: Response) => {
 export const getRoom = async (req: Request, res: Response) => {
   const room = await Room.findOne({ _id: req.params.id });
 
-  // TODO: Handle passwords
   if (!room) {
     return res
       .status(404)
