@@ -11,3 +11,15 @@ export const createRoomSchema = Joi.object({
   maxUsers: Joi.number().min(1).max(32).required(),
   password: Joi.string().optional().min(6),
 });
+
+export const forgotPasswordSchema = Joi.object({
+  email: Joi.string().min(6).email().required(),
+});
+
+export const changePasswordSchema = Joi.object({
+  password: Joi.string().min(6).required(),
+  confirm: Joi.any()
+    .equal(Joi.ref("password"))
+    .required()
+    .messages({ "any.only": "password didn't match. Try again." }),
+});

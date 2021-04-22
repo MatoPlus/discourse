@@ -16,3 +16,9 @@ export const createRefreshToken = (user: UserDocument) => {
     }
   );
 };
+
+export const createRecoverToken = (user: UserDocument) => {
+  return sign({ _id: user.id }, process.env.RECOVER_JWT_SECRET, {
+    expiresIn: "6h",
+  });
+};
