@@ -18,3 +18,14 @@ export const logoutUser = () =>
 
 export const fetchMe = () =>
   axios.get(`${path}/current`, { withCredentials: true });
+
+export const recoverUserPassword = (recoverBody: { email: string }) =>
+  axios.post(`${path}/recover`, recoverBody);
+
+export const changePassword = (
+  token: string,
+  changePasswordBody: {
+    password: string;
+    confirm: string;
+  }
+) => axios.put(`${path}/password/${token}`, changePasswordBody);
