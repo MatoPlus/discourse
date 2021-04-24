@@ -31,7 +31,7 @@ export async function getServerSideProps(_: any) {
   };
 }
 
-const Room = ({ rooms }: { rooms: [RoomProps] }) => {
+const Rooms = ({ rooms }: { rooms: [RoomProps] }) => {
   const data = useMemo<RoomProps[]>(() => [...rooms], []);
   const columns = useMemo<Column<RoomProps>[]>(
     () => [
@@ -142,4 +142,4 @@ const Room = ({ rooms }: { rooms: [RoomProps] }) => {
   );
 };
 
-export default Room;
+export default Rooms;

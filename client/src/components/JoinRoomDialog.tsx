@@ -7,10 +7,13 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
-  Link as ChakraLink,
 } from "@chakra-ui/react";
-import Link from "next/link";
+import { Form, Formik } from "formik";
+import { useRouter } from "next/router";
 import React from "react";
+import { enterRoom } from "../api/routes/rooms";
+import { getErrorMap } from "../utils/getErrorMap";
+import { InputField } from "./InputField";
 
 type JoinRoomDialogProps = {
   onClose: () => void;
@@ -25,6 +28,10 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
   onClose,
   cancelRef,
 }) => {
+  // I think we can have the button call the enter room endpoint with a password field
+  // On success, we push to the room id and let the room logic handle redirection...
+  const router = useRouter();
+
   return (
     <AlertDialog
       motionPreset="slideInBottom"
@@ -41,15 +48,33 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
         <AlertDialogBody>
           Here is a desc of the room, enter the password...
         </AlertDialogBody>
-        <AlertDialogFooter>
-          <Button ref={cancelRef} onClick={onClose}>
-            Cancel
-          </Button>
-          <Link href={`/rooms/${roomId}`}>
-            <Button colorScheme="teal" ml={3} as={ChakraLink}>
-              Join
-            </Button>
-          </Link>
+        <AlertDialogFooter m="auto">
+          <Formik
+            initialValues={{ password: "" }}
+            onSubmit={async (values, { setErrors }) => {
+              const response = await enterRoom(roomId, values).catch((err) => {
+                setErrors(getErrorMap(err.response.data.errors));
+              });
+              if (response && response.data) {
+                router.push(`/rooms/${roomId}`);
+              }
+            }}
+          >
+            <Form>
+              <InputField
+                name="password"
+                placeholder="password"
+                label="Password"
+                type="password"
+              />
+              <Button mt={4} ref={cancelRef} onClick={onClose}>
+                cancel
+              </Button>
+              <Button mt={4} ml={4} type="submit" colorScheme="teal">
+                join
+              </Button>
+            </Form>
+          </Formik>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

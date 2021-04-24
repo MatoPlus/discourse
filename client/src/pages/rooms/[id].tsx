@@ -1,25 +1,24 @@
+import { useColorMode } from "@chakra-ui/color-mode";
+import { Box, Heading } from "@chakra-ui/layout";
+import { Select } from "@chakra-ui/select";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/solarized.css";
-import { io, Socket } from "socket.io-client";
-import { Box, Heading } from "@chakra-ui/layout";
-import { Container } from "../../components/Container";
 import React, { useEffect, useRef, useState } from "react";
-import { RoomProps } from ".";
-import { fetchRoom } from "../../api/routes/rooms";
 import { Controlled as CodeMirror } from "react-codemirror2";
-import { useColorMode } from "@chakra-ui/color-mode";
-import { Select } from "@chakra-ui/select";
+import { useQuery } from "react-query";
+import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io-client/build/typed-events";
+import { RoomProps } from ".";
+import { fetchRoom, leaveRoom } from "../../api/routes/rooms";
+import { fetchMe } from "../../api/routes/users";
+import { Container } from "../../components/Container";
+import { codeMirrorModes } from "../../constants";
+import { requireSSRCodeMirror } from "../../utils/requireSSRCodeMirror";
 
-// A workaround for SSR
-if (typeof window !== "undefined" && typeof window.navigator !== "undefined") {
-  require("codemirror/mode/javascript/javascript");
-  require("codemirror/mode/xml/xml");
-  require("codemirror/mode/css/css");
-  require("codemirror/keymap/vim");
-  require("codemirror/keymap/emacs");
-}
+// Require all languages, key maps, and themes used for code mirror
+requireSSRCodeMirror();
 
+// ! we don't really want user side rendering...
 export async function getServerSideProps(context: any) {
   const { id } = context.query;
   const { data } = await fetchRoom(id as string);
@@ -30,7 +29,6 @@ export async function getServerSideProps(context: any) {
   };
 }
 
-// TODO: We want an is auth method of some sort
 const Room = ({ room }: { room: RoomProps }) => {
   if (!room) {
     return (
@@ -39,6 +37,8 @@ const Room = ({ room }: { room: RoomProps }) => {
       </Container>
     );
   }
+
+  // Ensure that requesting user is in the list of current users before continuing. Otherwise, redirect to Rooms
 
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap>>();
   const { colorMode } = useColorMode();
@@ -60,6 +60,7 @@ const Room = ({ room }: { room: RoomProps }) => {
 
     return () => {
       if (socketRef.current) {
+        leaveRoom(room._id).catch((err) => console.log(err));
         socketRef.current.disconnect();
       }
     };
@@ -103,9 +104,9 @@ const Room = ({ room }: { room: RoomProps }) => {
           }
         }}
       >
-        <option value="javascript">javascript</option>
-        <option value="xml">xml</option>
-        <option value="css">css</option>
+        {codeMirrorModes.map((mode) => (
+          <option value={mode}>{mode}</option>
+        ))}
       </Select>
       <Select
         size="sm"

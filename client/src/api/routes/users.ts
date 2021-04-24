@@ -28,4 +28,4 @@ export const changePassword = (
     password: string;
     confirm: string;
   }
-) => axios.put(`${path}/password/${token}`, changePasswordBody);
+) => axios.patch(`${path}/password/${token}`, changePasswordBody);

@@ -12,3 +12,9 @@ export const createRoom = (room: {
   maxUsers: number;
   password?: string;
 }) => axios.post(path, room);
+
+export const enterRoom = (id: string, room: { password?: string }) =>
+  axios.patch(`${path}/enter/${id}`, room, { withCredentials: true });
+
+export const leaveRoom = (id: string) =>
+  axios.patch(`${path}/leave/${id}`, { withCredentials: true });
