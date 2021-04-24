@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "react-query";
 import { fetchMe, logoutUser } from "../api/routes/users";
 import { setAccessToken } from "../accessToken";
 import { DarkModeSwitch } from "./DarkModeSwitch";
+import { useRouter } from "next/router";
 
 export const Navigation = ({
   bg,
@@ -15,6 +16,7 @@ export const Navigation = ({
 }) => {
   const queryClient = useQueryClient();
   const { data } = useQuery("me", fetchMe);
+  const router = useRouter();
 
   let body = (
     <>
@@ -36,6 +38,7 @@ export const Navigation = ({
             await logoutUser();
             setAccessToken("");
             queryClient.invalidateQueries("me");
+            router.push("/");
           }}
           variant="link"
           mr={4}
