@@ -29,13 +29,34 @@ export const getRoom = async (req: Request, res: Response) => {
 };
 
 export const enterRoom = async (req: AuthRequest, res: Response) => {
+  // Validate password here :)
   try {
-    await Room.findOneAndUpdate(
-      { _id: req.body.id },
-      { $push: { currentUsers: { userId: (req.user as any)._id } } }
-    );
-    return res.json(req.user);
+    const room = await Room.findOne({ _id: req.params.id });
+
+    if (!room) {
+      return res
+        .status(404)
+        .json({ errors: [new FieldError("_id", "Room not found")] });
+    }
+
+    if (room.hashedPassword) {
+      const validPass = await argon2.verify(
+        room.hashedPassword,
+        req.body.password
+      );
+      if (!validPass)
+        return res
+          .status(400)
+          .json({ errors: [new FieldError("password", "Invalid password")] });
+    }
+
+    room.currentUsers.push({ userId: (req.user as any)._id });
+    room.save();
+
+    // await Room.findOneAndUpdate({ _id: req.body.id });
+    return res.json(room);
   } catch (err) {
+    console.log(err);
     return res.status(404).json({ message: "Invalid room id" });
   }
 };
@@ -43,10 +64,10 @@ export const enterRoom = async (req: AuthRequest, res: Response) => {
 export const leaveRoom = async (req: AuthRequest, res: Response) => {
   try {
     await Room.findOneAndUpdate(
-      { _id: req.body.id },
+      { _id: req.params.id },
       { $pull: { currentUsers: { userId: (req.user as any)._id } } }
     );
-    return res.json(req.user);
+    return res.json({ _id: (req.user as any)._id });
   } catch (err) {
     return res.status(404).json({ message: "Invalid room id" });
   }

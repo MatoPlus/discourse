@@ -12,10 +12,15 @@ import authorize from "../middleware/authorize";
 const router = express.Router();
 
 router.post("/register", registerUser);
+
 router.post("/login", loginUser);
+
 router.get("/current", authorize, currentUser);
+
 router.post("/logout", logoutUser);
+
 router.post("/recover", recoverPassword);
-router.put("/password/:token", changePassword);
+
+router.patch("/password/:token", changePassword);
 
 export default router;
