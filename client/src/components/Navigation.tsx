@@ -6,6 +6,7 @@ import { fetchMe, logoutUser } from "../api/routes/users";
 import { setAccessToken } from "../accessToken";
 import { DarkModeSwitch } from "./DarkModeSwitch";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 export const Navigation = ({
   bg,
@@ -15,8 +16,17 @@ export const Navigation = ({
   disableSticky: boolean;
 }) => {
   const queryClient = useQueryClient();
-  const { data } = useQuery("me", fetchMe);
   const router = useRouter();
+  const [firstFetch, setFirstFetch] = useState(true);
+  const { data } = useQuery("me", fetchMe, {
+    onSuccess: (res) => {
+      if (res.data.errors && firstFetch) {
+        // Does two fetches to ensure auth-cookie loaded
+        setFirstFetch(false);
+        setTimeout(() => queryClient.invalidateQueries("me"), 500);
+      }
+    },
+  });
 
   let body = (
     <>
