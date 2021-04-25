@@ -21,7 +21,7 @@ import { sendEmail } from "../utils/sendEmail";
 export const currentUser = async (req: AuthRequest, res: Response) => {
   const user = await User.findOne({ _id: (req.user as any)._id });
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(404).json(new FieldError("_id", "User not found"));
   }
   return res
     .status(200)

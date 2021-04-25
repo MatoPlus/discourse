@@ -1,5 +1,6 @@
 import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
+import FieldError from "../entities/FieldError";
 import AuthRequest from "../types/AuthRequest";
 
 export default function authorize(
@@ -8,7 +9,10 @@ export default function authorize(
   next: NextFunction
 ) {
   const authorization = req.header("authorization");
-  if (!authorization) res.status(200).send({ message: "User not logged in" });
+  if (!authorization)
+    res
+      .status(200)
+      .send({ errors: [new FieldError("user", "User not logged int")] });
   else {
     try {
       // Following the bearer scheme
