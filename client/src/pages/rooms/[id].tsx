@@ -23,54 +23,82 @@ import { useGetId } from "../../utils/useGetId";
 // Require all languages, key maps, and themes used for code mirror
 requireSSRCodeMirror();
 
+const SAVE_INTERVAL_MS = 2000;
+
 const Room = () => {
   const id = useGetId();
-  const { data: verifiedData } = useQuery("verified", () =>
-    verifyUserForRoom(id as string)
+  const { data: verifiedData } = useQuery(
+    "verified",
+    () => verifyUserForRoom(id as string),
+    { enabled: id !== "-1" }
   );
   const { data: roomData, isLoading, error } = useQuery(
     "room",
     () => fetchRoom(id as string),
-    { enabled: id !== "-1" }
+    { enabled: id !== "-1", cacheTime: 0 }
   );
 
-  const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap>>();
   const { colorMode } = useColorMode();
-  const [code, setCode] = useState({ value: roomData?.data.content });
-  const [indent, setIndent] = useState(4);
-  const [language, setLanguage] = useState(roomData?.data.mode);
-  const [keybinding, setKeybinding] = useState("default");
+  const [content, setContent] = useState<string>();
+  const [indent, setIndent] = useState<number>(4);
+  const [language, setLanguage] = useState<string>();
+  const [keybinding, setKeybinding] = useState<string>("default");
+  const [docLoaded, setDocLoaded] = useState<boolean>(false);
   const [room, setRoom] = useState<RoomProps>();
+  const [socket, setSocket] = useState<
+    Socket<DefaultEventsMap, DefaultEventsMap>
+  >();
 
+  // Socket + room setup
   useEffect(() => {
-    // Socket configuration
-    socketRef.current = io(process.env.NEXT_PUBLIC_API_URL as string, {
-      query: { roomId: roomData?.data._id },
+    const soc = io(process.env.NEXT_PUBLIC_API_URL as string, {
+      query: { roomId: id },
     });
-    socketRef.current.on("code edit", (value) => {
-      setCode({ value });
-    });
-    socketRef.current.on("setting edit language", (language) => {
-      setLanguage(language);
-    });
-
-    // Setting states
-    setCode({ value: roomData?.data.content });
-    setLanguage(roomData?.data.mode);
-    setRoom(roomData?.data);
+    setSocket(soc);
 
     return () => {
-      if (socketRef.current) {
-        leaveRoom(roomData?.data._id).catch((err) => console.log(err));
-        socketRef.current.disconnect();
-      }
+      soc.disconnect();
+      leaveRoom(id).catch((err) => console.log(err));
     };
+  }, []);
+
+  // Room content setup
+  useEffect(() => {
+    setRoom(roomData?.data);
+    setContent(roomData?.data.content);
+    setLanguage(roomData?.data.mode);
+    setDocLoaded(true);
   }, [roomData]);
+
+  // Receiving boardcast from socket
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on("receive-content-change", (value) => {
+      setContent(value);
+    });
+    socket.on("receive-mode-change", (language) => {
+      setLanguage(language);
+    });
+  }, [socket]);
+
+  // Auto save content in intervals
+  useEffect(() => {
+    if (socket == null || content == null) return;
+
+    const interval = setTimeout(() => {
+      socket.emit("save-content", content);
+    }, SAVE_INTERVAL_MS);
+
+    return () => {
+      clearTimeout(interval);
+    };
+  }, [socket, content]);
 
   if (error) {
     return (
       <Container height="100vh">
-        <Hero title="Room Not Found"></Hero>
+        <Hero title="Room not found"></Hero>
       </Container>
     );
   }
@@ -105,12 +133,12 @@ const Room = () => {
       <Box width="100%" padding={5}>
         <CodeMirror
           onBeforeChange={(editor, data, value) => {
-            if (socketRef.current) {
-              socketRef.current.emit("code edit", value);
+            if (socket) {
+              socket.emit("send-content-change", value);
+              setContent(value);
             }
-            setCode({ value });
           }}
-          value={code.value}
+          value={content as string}
           options={{
             lineNumbers: true,
             lineWrapping: true,
@@ -119,6 +147,7 @@ const Room = () => {
             mode: language,
             theme: `solarized ${colorMode}`,
             keyMap: keybinding,
+            readOnly: !docLoaded,
           }}
         />
       </Box>
@@ -131,10 +160,10 @@ const Room = () => {
         name="language"
         value={language}
         onChange={(event) => {
-          let newLanguage = event.target.value;
-          setLanguage(newLanguage);
-          if (socketRef.current) {
-            socketRef.current.emit("setting edit language", newLanguage);
+          const newLanguage = event.target.value;
+          if (socket) {
+            socket.emit("send-mode-change", newLanguage);
+            setLanguage(newLanguage);
           }
         }}
       >
