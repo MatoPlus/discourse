@@ -7,32 +7,33 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
+  useToast,
 } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import { enterRoom } from "../api/routes/rooms";
+import { RoomProps } from "../pages/rooms";
 import { getErrorMap } from "../utils/getErrorMap";
 import { InputField } from "./InputField";
 
 type JoinRoomDialogProps = {
   onClose: () => void;
   isOpen: boolean;
-  roomId: string;
+  room: RoomProps;
   cancelRef: React.MutableRefObject<null>;
-  hasPassword: boolean;
 };
 
 export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
-  roomId,
+  room,
   isOpen,
   onClose,
   cancelRef,
-  hasPassword,
 }) => {
   // I think we can have the button call the enter room endpoint with a password field
   // On success, we push to the room id and let the room logic handle redirection...
   const router = useRouter();
+  const toast = useToast();
 
   return (
     <AlertDialog
@@ -45,63 +46,52 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
       <AlertDialogOverlay />
 
       <AlertDialogContent>
-        <AlertDialogHeader>Join room?</AlertDialogHeader>
+        <AlertDialogHeader>{`Join room - "${room.name}"?`}</AlertDialogHeader>
         <AlertDialogCloseButton />
         <AlertDialogBody>
-          Here is a desc of the room, enter the password...
+          {`Users: ${room.currentUsers.length}/${room.maxUsers}`}
         </AlertDialogBody>
         <AlertDialogFooter m="auto">
-          {hasPassword ? (
-            <Formik
-              initialValues={{ password: "" }}
-              onSubmit={async (values, { setErrors }) => {
-                const response = await enterRoom(roomId, values).catch(
-                  (err) => {
-                    setErrors(getErrorMap(err.response.data.errors));
-                  }
-                );
-                if (response && response.data && !response.data.errors) {
-                  router.push(`/rooms/${roomId}`);
+          <Formik
+            initialValues={{ password: "" }}
+            onSubmit={async (values, { setErrors }) => {
+              const response = await enterRoom(room._id, values).catch(
+                (err) => {
+                  (err.response.data.errors as string[]).forEach((error) => {
+                    if ((error as any).status) {
+                      toast({
+                        title: (error as any).status,
+                        status: "error",
+                        duration: 2000,
+                        isClosable: true,
+                      });
+                    }
+                  });
+                  setErrors(getErrorMap(err.response.data.errors));
                 }
-              }}
-            >
-              <Form>
+              );
+              if (response && response.data && !response.data.errors) {
+                router.push(`/rooms/${room._id}`);
+              }
+            }}
+          >
+            <Form>
+              {room.hasPassword ? (
                 <InputField
                   name="password"
                   placeholder="password"
                   label="Password"
                   type="password"
                 />
-                <Button mt={4} ref={cancelRef} onClick={onClose}>
-                  cancel
-                </Button>
-                <Button mt={4} ml={4} type="submit" colorScheme="teal">
-                  join
-                </Button>
-              </Form>
-            </Formik>
-          ) : (
-            <>
-              <Button ref={cancelRef} onClick={onClose}>
+              ) : null}
+              <Button mt={4} ref={cancelRef} onClick={onClose}>
                 cancel
               </Button>
-              <Button
-                colorScheme="teal"
-                ml={3}
-                onClick={async () => {
-                  const response = await enterRoom(roomId, {}).catch((err) => {
-                    console.log("can't enter room:", err);
-                  });
-                  console.log(response);
-                  if (response && response.data && !response.data.errors) {
-                    router.push(`/rooms/${roomId}`);
-                  }
-                }}
-              >
+              <Button mt={4} ml={4} type="submit" colorScheme="teal">
                 join
               </Button>
-            </>
-          )}
+            </Form>
+          </Formik>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

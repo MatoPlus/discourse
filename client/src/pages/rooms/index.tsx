@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/button";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
-import { Link as ChakraLink } from "@chakra-ui/layout";
+import { Heading, Link as ChakraLink } from "@chakra-ui/layout";
 import { useDisclosure } from "@chakra-ui/react";
 import { chakra } from "@chakra-ui/system";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table";
@@ -9,14 +9,13 @@ import React, { useMemo, useRef, useState } from "react";
 import { Column, useSortBy, useTable } from "react-table";
 import { fetchRooms } from "../../api/routes/rooms";
 import { Container } from "../../components/Container";
-import { Hero } from "../../components/Hero";
 import { JoinRoomDialog } from "../../components/JoinRoomDialog";
 
 export interface RoomProps {
   name: string;
   host: string;
   maxUsers: number;
-  currentUsers: [{ userId: string }];
+  currentUsers: [{ userId: string }?];
   content: string;
   mode: string;
   hasPassword: boolean;
@@ -33,8 +32,16 @@ export async function getServerSideProps(_: any) {
 }
 
 const Rooms = ({ rooms }: { rooms: [RoomProps] }) => {
-  const data = useMemo<RoomProps[]>(() => [...rooms], []);
-  const columns = useMemo<Column<RoomProps>[]>(
+  const roomsWithUserStatus: any = rooms.map((room) => {
+    (room as any).activeUsers = `${room.currentUsers.length}/${room.maxUsers}`;
+    return room;
+  });
+  const data = useMemo<(RoomProps & { activeUsers: string })[]>(
+    () => [...roomsWithUserStatus],
+    []
+  );
+
+  const columns = useMemo<Column<RoomProps & { activeUsers: string }>[]>(
     () => [
       {
         Header: "Room",
@@ -45,9 +52,8 @@ const Rooms = ({ rooms }: { rooms: [RoomProps] }) => {
         accessor: "host",
       },
       {
-        Header: "Max Users",
-        accessor: "maxUsers",
-        isNumeric: true,
+        Header: "Users",
+        accessor: "activeUsers",
       },
     ],
     []
@@ -63,14 +69,25 @@ const Rooms = ({ rooms }: { rooms: [RoomProps] }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
-  const [roomData, setRoomData] = useState({ roomId: "", hasPassword: false });
+  const [roomData, setRoomData] = useState<RoomProps>({
+    _id: "",
+    hasPassword: false,
+    name: "",
+    maxUsers: 1,
+    currentUsers: [],
+    host: "",
+    content: "",
+    mode: "",
+  });
 
   return (
     <>
-      <Container height="100vh">
-        <Hero title={"Rooms"} />
+      <Container>
+        <Heading p={4} mr="auto" size="2xl">
+          Rooms
+        </Heading>
         <Link href="/rooms/create">
-          <Button mb={2} as={ChakraLink} colorScheme="teal">
+          <Button m={4} ml="auto" as={ChakraLink} colorScheme="teal">
             create room
           </Button>
         </Link>
@@ -113,10 +130,7 @@ const Rooms = ({ rooms }: { rooms: [RoomProps] }) => {
                       {cell.column.Header?.toString() === columns[0].Header ? (
                         <ChakraLink
                           onClick={() => {
-                            setRoomData({
-                              roomId: rooms[row.index]._id.toString(),
-                              hasPassword: !!rooms[row.index].hasPassword,
-                            });
+                            setRoomData(rooms[row.index]);
                             onOpen();
                           }}
                         >
@@ -135,7 +149,7 @@ const Rooms = ({ rooms }: { rooms: [RoomProps] }) => {
       </Container>
 
       <JoinRoomDialog
-        {...roomData}
+        room={roomData}
         cancelRef={cancelRef}
         isOpen={isOpen}
         onClose={onClose}
