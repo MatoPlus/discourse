@@ -1,12 +1,11 @@
 import { Box, Flex, Heading } from "@chakra-ui/layout";
-import Link from "next/link";
 import { Button, Link as ChakraLink } from "@chakra-ui/react";
-import { useQuery, useQueryClient } from "react-query";
-import { fetchMe, logoutUser } from "../api/routes/users";
-import { setAccessToken } from "../accessToken";
-import { DarkModeSwitch } from "./DarkModeSwitch";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useQuery, useQueryClient } from "react-query";
+import { setAccessToken } from "../accessToken";
+import { fetchMe, logoutUser } from "../api/routes/users";
+import { DarkModeSwitch } from "./DarkModeSwitch";
 
 export const Navigation = ({
   bg,
@@ -17,29 +16,13 @@ export const Navigation = ({
 }) => {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const [firstFetch, setFirstFetch] = useState(true);
-  const { data } = useQuery("me", fetchMe, {
-    onSuccess: (res) => {
-      if (res.data.errors && firstFetch) {
-        // Does two fetches to ensure auth-cookie loaded
-        setFirstFetch(false);
-        setTimeout(() => queryClient.invalidateQueries("me"), 500);
-      }
-    },
+  const { data, error } = useQuery("me", fetchMe, {
+    retry: 2,
   });
 
-  let body = (
-    <>
-      <Link href="/login">
-        <ChakraLink mr={2}>login</ChakraLink>
-      </Link>
-      <Link href="/register">
-        <ChakraLink mr={4}>register</ChakraLink>
-      </Link>
-    </>
-  );
+  let body;
 
-  if (data?.data.username) {
+  if (data?.data.username && !error) {
     body = (
       <>
         <Box mr={2}>{data.data.username}</Box>
@@ -48,13 +31,24 @@ export const Navigation = ({
             await logoutUser();
             setAccessToken("");
             queryClient.invalidateQueries("me");
-            router.push("/");
+            router.reload();
           }}
           variant="link"
           mr={4}
         >
           logout
         </Button>
+      </>
+    );
+  } else {
+    body = (
+      <>
+        <Link href="/login">
+          <ChakraLink mr={2}>login</ChakraLink>
+        </Link>
+        <Link href="/register">
+          <ChakraLink mr={4}>register</ChakraLink>
+        </Link>
       </>
     );
   }
