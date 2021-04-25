@@ -19,6 +19,7 @@ export interface RoomProps {
   currentUsers: [{ userId: string }];
   content: string;
   mode: string;
+  hasPassword: boolean;
   _id: string;
 }
 
@@ -62,7 +63,7 @@ const Rooms = ({ rooms }: { rooms: [RoomProps] }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
-  const [roomData, setRoomData] = useState({ roomId: "" });
+  const [roomData, setRoomData] = useState({ roomId: "", hasPassword: false });
 
   return (
     <>
@@ -114,6 +115,7 @@ const Rooms = ({ rooms }: { rooms: [RoomProps] }) => {
                           onClick={() => {
                             setRoomData({
                               roomId: rooms[row.index]._id.toString(),
+                              hasPassword: !!rooms[row.index].hasPassword,
                             });
                             onOpen();
                           }}

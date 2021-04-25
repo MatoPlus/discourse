@@ -18,3 +18,6 @@ export const enterRoom = (id: string, room: { password?: string }) =>
 
 export const leaveRoom = (id: string) =>
   axios.patch(`${path}/leave/${id}`, { withCredentials: true });
+
+export const verifyUserForRoom = (id: string) =>
+  axios.get(`${path}/verify/${id}`, { withCredentials: true });

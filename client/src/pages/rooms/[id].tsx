@@ -5,49 +5,47 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/solarized.css";
 import React, { useEffect, useRef, useState } from "react";
 import { Controlled as CodeMirror } from "react-codemirror2";
+import { useQuery } from "react-query";
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io-client/build/typed-events";
 import { RoomProps } from ".";
-import { fetchRoom, leaveRoom } from "../../api/routes/rooms";
+import {
+  fetchRoom,
+  leaveRoom,
+  verifyUserForRoom,
+} from "../../api/routes/rooms";
 import { Container } from "../../components/Container";
+import { Hero } from "../../components/Hero";
 import { codeMirrorModes } from "../../constants";
 import { requireSSRCodeMirror } from "../../utils/requireSSRCodeMirror";
+import { useGetId } from "../../utils/useGetId";
 
 // Require all languages, key maps, and themes used for code mirror
 requireSSRCodeMirror();
 
-// ! we don't really want user side rendering...
-export async function getServerSideProps(context: any) {
-  const { id } = context.query;
-  const { data } = await fetchRoom(id as string);
-  return {
-    props: {
-      room: data,
-    },
-  };
-}
-
-const Room = ({ room }: { room: RoomProps }) => {
-  if (!room) {
-    return (
-      <Container height="100vh">
-        <Box>could not find post</Box>
-      </Container>
-    );
-  }
-
-  // Ensure that requesting user is in the list of current users before continuing. Otherwise, redirect to Rooms
+const Room = () => {
+  const id = useGetId();
+  const { data: verifiedData } = useQuery("verified", () =>
+    verifyUserForRoom(id as string)
+  );
+  const { data: roomData, isLoading, error } = useQuery(
+    "room",
+    () => fetchRoom(id as string),
+    { enabled: id !== "-1" }
+  );
 
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap>>();
   const { colorMode } = useColorMode();
-  const [code, setCode] = useState({ value: room.content });
+  const [code, setCode] = useState({ value: roomData?.data.content });
   const [indent, setIndent] = useState(4);
-  const [language, setLanguage] = useState(room.mode);
+  const [language, setLanguage] = useState(roomData?.data.mode);
   const [keybinding, setKeybinding] = useState("default");
+  const [room, setRoom] = useState<RoomProps>();
 
   useEffect(() => {
+    // Socket configuration
     socketRef.current = io(process.env.NEXT_PUBLIC_API_URL as string, {
-      query: { roomId: room._id },
+      query: { roomId: roomData?.data._id },
     });
     socketRef.current.on("code edit", (value) => {
       setCode({ value });
@@ -56,13 +54,51 @@ const Room = ({ room }: { room: RoomProps }) => {
       setLanguage(language);
     });
 
+    // Setting states
+    setCode({ value: roomData?.data.content });
+    setLanguage(roomData?.data.mode);
+    setRoom(roomData?.data);
+
     return () => {
       if (socketRef.current) {
-        leaveRoom(room._id).catch((err) => console.log(err));
+        leaveRoom(roomData?.data._id).catch((err) => console.log(err));
         socketRef.current.disconnect();
       }
     };
-  }, []);
+  }, [roomData]);
+
+  if (error) {
+    return (
+      <Container height="100vh">
+        <Hero title="Room Not Found"></Hero>
+      </Container>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <Container height="100vh">
+        <Hero title="Loading..."></Hero>
+      </Container>
+    );
+  }
+
+  if (!room) {
+    return (
+      <Container height="100vh">
+        <Hero title="Room not found..."></Hero>
+      </Container>
+    );
+  }
+
+  if (!verifiedData?.data.verified) {
+    // TODO: This should ideally show the password prompt for room
+    return (
+      <Container height="100vh">
+        <Hero title="No Permission to Join Room"></Hero>
+      </Container>
+    );
+  }
 
   return (
     <Container height="100%" disableStickyNav>
