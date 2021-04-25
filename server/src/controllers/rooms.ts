@@ -1,11 +1,12 @@
-import { Request, Response } from "express";
-import { createRoomSchema } from "../schemas/schema";
 import argon2 from "argon2";
-import Room from "../models/room";
-import RoomDocument from "../types/RoomDocument";
+import { Request, Response } from "express";
+import ErrorStatus from "../entities/ErrorStatus";
 import FieldError from "../entities/FieldError";
+import Room from "../models/room";
 import User from "../models/user";
+import { createRoomSchema } from "../schemas/schema";
 import AuthRequest from "../types/AuthRequest";
+import RoomDocument from "../types/RoomDocument";
 
 export const getRooms = async (_: Request, res: Response) => {
   try {
@@ -39,7 +40,7 @@ export const enterRoom = async (req: AuthRequest, res: Response) => {
     if (!room) {
       return res
         .status(404)
-        .json({ errors: [new FieldError("_id", "Room not found")] });
+        .json({ errors: [new ErrorStatus("Room not found")] });
     }
 
     if (room.hashedPassword) {
@@ -53,6 +54,12 @@ export const enterRoom = async (req: AuthRequest, res: Response) => {
           .json({ errors: [new FieldError("password", "Invalid password")] });
     }
 
+    if (room.currentUsers.length >= room.maxUsers) {
+      return res
+        .status(400)
+        .json({ errors: [new ErrorStatus("Room is full")] });
+    }
+
     room.currentUsers.push({ userId: (req.user as any)._id });
     room.save();
 
@@ -60,7 +67,9 @@ export const enterRoom = async (req: AuthRequest, res: Response) => {
     return res.json(room);
   } catch (err) {
     console.log(err);
-    return res.status(404).json({ message: "Invalid room id" });
+    return res
+      .status(404)
+      .json({ errors: [new ErrorStatus("Invalid room id")] });
   }
 };
 

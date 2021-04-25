@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
-import FieldError from "../entities/FieldError";
+import ErrorStatus from "../entities/ErrorStatus";
 import AuthRequest from "../types/AuthRequest";
 
 export default function authorize(
@@ -10,9 +10,7 @@ export default function authorize(
 ) {
   const authorization = req.header("authorization");
   if (!authorization)
-    res
-      .status(200)
-      .send({ errors: [new FieldError("user", "User not logged int")] });
+    res.status(401).send({ errors: [new ErrorStatus("User not logged in")] });
   else {
     try {
       // Following the bearer scheme
@@ -21,7 +19,7 @@ export default function authorize(
       req.user = verified;
       next();
     } catch (err) {
-      res.status(401).send({ message: "Invalid Token" });
+      res.status(401).send({ errors: [new ErrorStatus("Invalid Token")] });
     }
   }
 }

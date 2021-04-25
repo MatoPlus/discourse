@@ -9,7 +9,7 @@ export const registerUserSchema = Joi.object({
 export const createRoomSchema = Joi.object({
   name: Joi.string().min(4).required(),
   maxUsers: Joi.number().min(1).max(32).required(),
-  password: Joi.string().optional().min(6),
+  password: Joi.string().optional().min(4),
 });
 
 export const forgotPasswordSchema = Joi.object({
