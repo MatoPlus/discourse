@@ -7,10 +7,8 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
-  Link as ChakraLink,
 } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { enterRoom } from "../api/routes/rooms";
@@ -62,7 +60,7 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
                     setErrors(getErrorMap(err.response.data.errors));
                   }
                 );
-                if (response && response.data) {
+                if (response && response.data && !response.data.errors) {
                   router.push(`/rooms/${roomId}`);
                 }
               }}
@@ -87,11 +85,21 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
               <Button ref={cancelRef} onClick={onClose}>
                 cancel
               </Button>
-              <Link href={`/rooms/${roomId}`}>
-                <Button colorScheme="teal" ml={3} as={ChakraLink}>
-                  join
-                </Button>
-              </Link>
+              <Button
+                colorScheme="teal"
+                ml={3}
+                onClick={async () => {
+                  const response = await enterRoom(roomId, {}).catch((err) => {
+                    console.log("can't enter room:", err);
+                  });
+                  console.log(response);
+                  if (response && response.data && !response.data.errors) {
+                    router.push(`/rooms/${roomId}`);
+                  }
+                }}
+              >
+                join
+              </Button>
             </>
           )}
         </AlertDialogFooter>
