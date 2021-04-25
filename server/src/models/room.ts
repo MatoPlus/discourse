@@ -16,6 +16,10 @@ const roomSchema: Schema = new mongoose.Schema(
       minlength: 1,
       maxlength: 32,
     },
+    hasPassword: {
+      type: Boolean,
+      required: true,
+    },
     hashedPassword: {
       type: String,
       trim: true,

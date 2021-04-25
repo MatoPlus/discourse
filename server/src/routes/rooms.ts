@@ -6,6 +6,7 @@ import {
   getRoom,
   enterRoom,
   leaveRoom,
+  verifyUser,
 } from "../controllers/rooms";
 
 const router = express.Router();
@@ -20,5 +21,7 @@ router.post("/", authorize, createRoom);
 router.patch("/enter/:id", authorize, enterRoom);
 
 router.patch("/leave/:id", authorize, leaveRoom);
+
+router.get("/verify/:id", authorize, verifyUser);
 
 export default router;
