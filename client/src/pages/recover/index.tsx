@@ -23,18 +23,26 @@ const Recover = () => {
             }
           }}
         >
-          {requested ? (
-            <Box>
-              If an account with that email exists, we sent you a recovery email
-            </Box>
-          ) : (
-            <Form>
-              <InputField name="email" placeholder="email" label="Email" />
-              <Button mt={4} type="submit" colorScheme="teal">
-                recover
-              </Button>
-            </Form>
-          )}
+          {({ isSubmitting }) =>
+            requested ? (
+              <Box>
+                If an account with that email exists, we sent you a recovery
+                email
+              </Box>
+            ) : (
+              <Form>
+                <InputField name="email" placeholder="email" label="Email" />
+                <Button
+                  mt={4}
+                  type="submit"
+                  colorScheme="teal"
+                  isLoading={isSubmitting}
+                >
+                  recover
+                </Button>
+              </Form>
+            )
+          }
         </Formik>
       </Box>
     </Container>

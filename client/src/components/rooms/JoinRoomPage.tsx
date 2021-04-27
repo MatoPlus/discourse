@@ -47,22 +47,30 @@ export const JoinRoomPage: React.FC<JoinRoomPageProps> = ({ roomId, room }) => {
           }
         }}
       >
-        <Form>
-          {room.hasPassword ? (
-            <InputField
-              name="password"
-              placeholder="password"
-              label="Password"
-              type="password"
-            />
-          ) : null}
-          <Button mt={4} onClick={() => router.push("/rooms/")}>
-            cancel
-          </Button>
-          <Button mt={4} ml={4} type="submit" colorScheme="teal">
-            join
-          </Button>
-        </Form>
+        {({ isSubmitting }) => (
+          <Form>
+            {room.hasPassword ? (
+              <InputField
+                name="password"
+                placeholder="password"
+                label="Password"
+                type="password"
+              />
+            ) : null}
+            <Button mt={4} onClick={() => router.push("/rooms/")}>
+              cancel
+            </Button>
+            <Button
+              mt={4}
+              ml={4}
+              type="submit"
+              colorScheme="teal"
+              isLoading={isSubmitting}
+            >
+              join
+            </Button>
+          </Form>
+        )}
       </Formik>
     </Box>
   );

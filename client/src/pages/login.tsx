@@ -27,29 +27,36 @@ const Login = () => {
             }
           }}
         >
-          <Form>
-            <InputField
-              name="usernameOrEmail"
-              placeholder="username or email"
-              label="Username or Email"
-            />
-            <Box mt={4}>
+          {({ isSubmitting }) => (
+            <Form>
               <InputField
-                name="password"
-                placeholder="password"
-                label="Password"
-                type="password"
+                name="usernameOrEmail"
+                placeholder="username or email"
+                label="Username or Email"
               />
-            </Box>
-            <Flex mt={2}>
-              <Link href="/recover">
-                <ChakraLink ml="auto">forgot password?</ChakraLink>
-              </Link>
-            </Flex>
-            <Button mt={4} type="submit" colorScheme="teal">
-              login
-            </Button>
-          </Form>
+              <Box mt={4}>
+                <InputField
+                  name="password"
+                  placeholder="password"
+                  label="Password"
+                  type="password"
+                />
+              </Box>
+              <Flex mt={2}>
+                <Link href="/recover">
+                  <ChakraLink ml="auto">forgot password?</ChakraLink>
+                </Link>
+              </Flex>
+              <Button
+                mt={4}
+                type="submit"
+                colorScheme="teal"
+                isLoading={isSubmitting}
+              >
+                login
+              </Button>
+            </Form>
+          )}
         </Formik>
       </Box>
     </Container>

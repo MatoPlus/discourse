@@ -29,31 +29,38 @@ const CreateRoom = () => {
             }
           }}
         >
-          <Form>
-            <InputField name="name" placeholder="name" label="Room name" />
-            <Box mt={4}>
-              <InputField
-                inputType="number"
-                name="maxUsers"
-                placeholder="max users"
-                label="Max users"
-                defaultValue={1}
-                min={1}
-                max={32}
-              />
-            </Box>
-            <Box mt={4}>
-              <InputField
-                name="password"
-                placeholder="password"
-                label="Optional password"
-                type="password"
-              />
-            </Box>
-            <Button mt={4} type="submit" colorScheme="teal">
-              create room
-            </Button>
-          </Form>
+          {({ isSubmitting }) => (
+            <Form>
+              <InputField name="name" placeholder="name" label="Room name" />
+              <Box mt={4}>
+                <InputField
+                  inputType="number"
+                  name="maxUsers"
+                  placeholder="max users"
+                  label="Max users"
+                  defaultValue={1}
+                  min={1}
+                  max={32}
+                />
+              </Box>
+              <Box mt={4}>
+                <InputField
+                  name="password"
+                  placeholder="password"
+                  label="Optional password"
+                  type="password"
+                />
+              </Box>
+              <Button
+                mt={4}
+                type="submit"
+                colorScheme="teal"
+                isLoading={isSubmitting}
+              >
+                create room
+              </Button>
+            </Form>
+          )}
         </Formik>
       </Box>
     </Container>

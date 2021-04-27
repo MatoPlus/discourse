@@ -37,35 +37,42 @@ const ChangePassword = () => {
             }
           }}
         >
-          <Form>
-            <InputField
-              name="password"
-              placeholder="password"
-              label="Password"
-              type="password"
-            />
-            <Box mt={4}>
+          {({ isSubmitting }) => (
+            <Form>
               <InputField
-                name="confirm"
-                placeholder="confirm"
-                label="Confirm"
+                name="password"
+                placeholder="password"
+                label="Password"
                 type="password"
               />
-            </Box>
-            {tokenError ? (
-              <Flex>
-                <Box mr={2}>
-                  <Text color="red.400">{tokenError}</Text>
-                </Box>
-                <Link href="/recover">
-                  <ChakraLink>- get a new token</ChakraLink>
-                </Link>
-              </Flex>
-            ) : null}
-            <Button mt={4} type="submit" colorScheme="teal">
-              change password
-            </Button>
-          </Form>
+              <Box mt={4}>
+                <InputField
+                  name="confirm"
+                  placeholder="confirm"
+                  label="Confirm"
+                  type="password"
+                />
+              </Box>
+              {tokenError ? (
+                <Flex>
+                  <Box mr={2}>
+                    <Text color="red.400">{tokenError}</Text>
+                  </Box>
+                  <Link href="/recover">
+                    <ChakraLink>- get a new token</ChakraLink>
+                  </Link>
+                </Flex>
+              ) : null}
+              <Button
+                mt={4}
+                type="submit"
+                colorScheme="teal"
+                isLoading={isSubmitting}
+              >
+                change password
+              </Button>
+            </Form>
+          )}
         </Formik>
       </Box>
     </Container>
