@@ -82,7 +82,7 @@ const Rooms = ({ rooms }: { rooms: [RoomProps] }) => {
 
   return (
     <>
-      <Container>
+      <Container height="100vh">
         <Heading p={4} mr="auto" size="2xl">
           Rooms
         </Heading>

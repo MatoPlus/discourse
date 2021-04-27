@@ -129,7 +129,7 @@ const Room = () => {
   }
 
   return (
-    <Container height="100%" disableStickyNav>
+    <Container height="100vh" disableStickyNav>
       <Box width="100%" padding={5}>
         <CodeMirror
           onBeforeChange={(editor, data, value) => {
