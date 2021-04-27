@@ -11,7 +11,7 @@ export const Container = ({
   const navBgColor = { light: "gray.100", dark: "gray.800" };
   const color = { light: "black", dark: "white" };
   return (
-    <Box height="100vh">
+    <Box>
       <Navigation
         bg={navBgColor[colorMode]}
         disableSticky={!!disableStickyNav}
