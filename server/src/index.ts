@@ -34,7 +34,10 @@ const main = async () => {
 
     socket.on("save-content", async (content) => {
       console.log("saved...");
-      await Room.findOneAndUpdate({ _id: roomId }, { $set: { content } });
+      await Room.findOneAndUpdate(
+        { _id: roomId },
+        { $set: { content } }
+      ).catch((err) => console.log("save error:", err));
     });
 
     socket.on("send-mode-change", async (language) => {

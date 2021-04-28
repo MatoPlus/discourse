@@ -119,20 +119,26 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
 };
 
 export const verifyUser = async (req: AuthRequest, res: Response) => {
-  const room = await Room.findOne({ _id: req.params.id });
+  try {
+    const room = await Room.findOne({ _id: req.params.id });
 
-  if (!room) {
-    return res
-      .status(404)
-      .json({ errors: [new FieldError("_id", "Room not found")] });
-  }
-
-  // return true or false based on whether current user is in currentUsers
-  let isVerified = false;
-  room.currentUsers.forEach((user) => {
-    if (user.userId === (req.user as any)._id) {
-      isVerified = true;
+    if (!room) {
+      return res
+        .status(404)
+        .json({ errors: [new FieldError("_id", "Room not found")] });
     }
-  });
-  return res.json({ _id: (req.user as any)._id, verified: isVerified });
+
+    // return true or false based on whether current user is in currentUsers
+    let isVerified = false;
+    room.currentUsers.forEach((user) => {
+      if (user.userId === (req.user as any)._id) {
+        isVerified = true;
+      }
+    });
+    return res.json({ _id: (req.user as any)._id, verified: isVerified });
+  } catch (err) {
+    return res
+      .status(400)
+      .json({ errors: [new ErrorStatus("Invalid room id")] });
+  }
 };
