@@ -1,6 +1,7 @@
 import { useColorMode } from "@chakra-ui/color-mode";
 import { Box, Heading } from "@chakra-ui/layout";
 import { Select } from "@chakra-ui/select";
+import { Spinner } from "@chakra-ui/spinner";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/solarized.css";
 import React, { useEffect, useState } from "react";
@@ -33,10 +34,13 @@ const Room = () => {
     () => verifyUserForRoom(id as string),
     { enabled: id !== "-1" }
   );
-  const { data: roomData, isLoading, error } = useQuery(
+  const { data: roomData, isLoading, isError } = useQuery(
     "room",
     () => fetchRoom(id as string),
-    { enabled: id !== "-1", cacheTime: 0 }
+    {
+      enabled: id !== "-1",
+      cacheTime: 0,
+    }
   );
 
   const { colorMode } = useColorMode();
@@ -52,6 +56,8 @@ const Room = () => {
 
   // Socket + room setup
   useEffect(() => {
+    if (id === "-1") return;
+
     const soc = io(process.env.NEXT_PUBLIC_API_URL as string, {
       query: { roomId: id },
     });
@@ -61,7 +67,7 @@ const Room = () => {
       soc.disconnect();
       leaveRoom(id).catch((err) => console.log(err));
     };
-  }, []);
+  }, [id]);
 
   // Room content setup
   useEffect(() => {
@@ -96,7 +102,7 @@ const Room = () => {
     };
   }, [socket, content]);
 
-  if (error) {
+  if (isError) {
     return (
       <Container height="100vh">
         <Hero title="Room not found"></Hero>
@@ -104,18 +110,10 @@ const Room = () => {
     );
   }
 
-  if (isLoading) {
+  if (isLoading || !room) {
     return (
       <Container height="100vh">
-        <Hero title="Loading..."></Hero>
-      </Container>
-    );
-  }
-
-  if (!room) {
-    return (
-      <Container height="100vh">
-        <Hero title="Room not found..."></Hero>
+        <Spinner size="xl" m="auto" />
       </Container>
     );
   }
