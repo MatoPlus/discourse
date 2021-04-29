@@ -54,7 +54,7 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
         <AlertDialogFooter m="auto">
           <Formik
             initialValues={{ password: "" }}
-            onSubmit={async (values, { setErrors }) => {
+            onSubmit={async (values, { setErrors, setSubmitting }) => {
               const response = await enterRoom(room._id, values).catch(
                 (err) => {
                   (err.response.data.errors as string[]).forEach((error) => {
@@ -71,6 +71,7 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
                 }
               );
               if (response && response.data && !response.data.errors) {
+                setSubmitting(true);
                 router.push(`/rooms/${room._id}`);
               }
             }}
