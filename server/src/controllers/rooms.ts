@@ -1,6 +1,6 @@
 import argon2 from "argon2";
 import { Request, Response } from "express";
-import ErrorStatus from "../entities/ErrorStatus";
+import Status from "../entities/Status";
 import FieldError from "../entities/FieldError";
 import Room from "../models/room";
 import User from "../models/user";
@@ -38,9 +38,13 @@ export const enterRoom = async (req: AuthRequest, res: Response) => {
     const room = await Room.findOne({ _id: req.params.id });
 
     if (!room) {
-      return res
-        .status(404)
-        .json({ errors: [new ErrorStatus("Room not found")] });
+      return res.status(404).json({ errors: [new Status("Room not found")] });
+    }
+
+    if (
+      room.currentUsers.some((user) => user.userId === (req.user as any)._id)
+    ) {
+      return res.json(room);
     }
 
     if (room.hashedPassword) {
@@ -55,21 +59,17 @@ export const enterRoom = async (req: AuthRequest, res: Response) => {
     }
 
     if (room.currentUsers.length >= room.maxUsers) {
-      return res
-        .status(400)
-        .json({ errors: [new ErrorStatus("Room is full")] });
+      return res.status(400).json({ errors: [new Status("Room is full")] });
     }
 
+    // join room if not already in room
     room.currentUsers.push({ userId: (req.user as any)._id });
     room.save();
 
-    // await Room.findOneAndUpdate({ _id: req.body.id });
     return res.json(room);
   } catch (err) {
     console.log(err);
-    return res
-      .status(404)
-      .json({ errors: [new ErrorStatus("Invalid room id")] });
+    return res.status(404).json({ errors: [new Status("Invalid room id")] });
   }
 };
 
@@ -137,8 +137,6 @@ export const verifyUser = async (req: AuthRequest, res: Response) => {
     });
     return res.json({ _id: (req.user as any)._id, verified: isVerified });
   } catch (err) {
-    return res
-      .status(400)
-      .json({ errors: [new ErrorStatus("Invalid room id")] });
+    return res.status(400).json({ errors: [new Status("Invalid room id")] });
   }
 };

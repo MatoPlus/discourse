@@ -1,4 +1,4 @@
-export default class ErrorStatus {
+export default class Status {
   status: string;
 
   constructor(status: string) {
