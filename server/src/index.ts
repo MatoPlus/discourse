@@ -23,8 +23,12 @@ const main = async () => {
     console.log("a user has connected");
 
     // Join a code room
-    const { roomId } = socket.handshake.query;
-    socket.join(roomId as string);
+    const { roomId, username } = socket.handshake.query;
+
+    if (roomId) {
+      socket.join(roomId as string);
+      socket.broadcast.to(roomId as string).emit("user-join", username);
+    }
 
     socket.on("send-content-change", (value) => {
       socket.broadcast
@@ -52,14 +56,20 @@ const main = async () => {
       );
     });
 
+    socket.on("send-chat-message", (value) => {
+      io.to(roomId as string).emit("receive-chat-message", {
+        value: value,
+        username: username,
+      });
+    });
+
     // TODO: Add count down to disconnect sockets when no user in room
     socket.on("disconnect", () => {
       console.log("user disconnected");
+      socket.broadcast.to(roomId as string).emit("user-leave", username);
       socket.leave(roomId as string);
     });
   });
-
-  // TODO: Use a redis session to store room cookies (needed for anon users) that keeps track of { temp: boolean, username: string }
 
   app.use(
     cors({
