@@ -3,7 +3,7 @@ import UserDocument from "../types/UserDocument";
 
 export const createAccessToken = (user: UserDocument) => {
   return sign({ _id: user.id }, process.env.ACCESS_JWT_SECRET, {
-    expiresIn: "30min",
+    expiresIn: "1d",
   });
 };
 
