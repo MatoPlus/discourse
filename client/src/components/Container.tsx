@@ -1,21 +1,21 @@
 import { Flex, useColorMode, FlexProps, Box } from "@chakra-ui/react";
 import { Navigation } from "./Navigation";
 
-export const Container = ({
+type ContainerProps = {
+  disableStickyNav?: boolean;
+} & FlexProps;
+
+export const Container: React.FC<ContainerProps> = ({
   disableStickyNav,
   ...props
-}: FlexProps & { disableStickyNav?: boolean }) => {
+}) => {
   const { colorMode } = useColorMode();
 
   const bgColor = { light: "gray.50", dark: "gray.900" };
-  const navBgColor = { light: "gray.100", dark: "gray.800" };
   const color = { light: "black", dark: "white" };
   return (
     <Box>
-      <Navigation
-        bg={navBgColor[colorMode]}
-        disableSticky={!!disableStickyNav}
-      />
+      <Navigation disableSticky={!!disableStickyNav} />
       <Flex
         direction="column"
         alignItems="center"

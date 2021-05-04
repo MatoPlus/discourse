@@ -1,5 +1,9 @@
 import { Box, Flex, Heading } from "@chakra-ui/layout";
-import { Button, Link as ChakraLink } from "@chakra-ui/react";
+import {
+  Button,
+  Link as ChakraLink,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useQuery, useQueryClient } from "react-query";
@@ -7,18 +11,17 @@ import { setAccessToken } from "../accessToken";
 import { fetchMe, logoutUser } from "../api/routes/users";
 import { DarkModeSwitch } from "./DarkModeSwitch";
 
-export const Navigation = ({
-  bg,
-  disableSticky,
-}: {
-  bg: string;
+type NavigationProps = {
   disableSticky: boolean;
-}) => {
+};
+
+export const Navigation: React.FC<NavigationProps> = ({ disableSticky }) => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const { data, error } = useQuery("me", fetchMe, {
     retry: 2,
   });
+  const color = useColorModeValue("gray.100", "gray.800");
 
   let body;
 
@@ -59,7 +62,7 @@ export const Navigation = ({
       position={disableSticky ? undefined : "sticky"}
       top={0}
       p={3}
-      bg={bg}
+      bg={color}
     >
       <Flex flex={1} m="auto" align="center" maxW={800}>
         <Link href="/">

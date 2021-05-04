@@ -63,6 +63,7 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
                         title: (error as any).status,
                         status: "error",
                         duration: 2000,
+                        position: "bottom-left",
                         isClosable: true,
                       });
                     }

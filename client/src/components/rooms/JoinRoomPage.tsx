@@ -34,6 +34,7 @@ export const JoinRoomPage: React.FC<JoinRoomPageProps> = ({ roomId, room }) => {
                   title: (error as any).status,
                   status: "error",
                   duration: 2000,
+                  position: "bottom-left",
                   isClosable: true,
                 });
               }

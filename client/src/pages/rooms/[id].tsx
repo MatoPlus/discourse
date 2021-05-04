@@ -1,7 +1,9 @@
 import { useColorMode } from "@chakra-ui/color-mode";
-import { Box, Heading } from "@chakra-ui/layout";
+import { useDisclosure } from "@chakra-ui/hooks";
+import { Box, Heading, Text } from "@chakra-ui/layout";
 import { Select } from "@chakra-ui/select";
 import { Spinner } from "@chakra-ui/spinner";
+import { useToast } from "@chakra-ui/toast";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/solarized.css";
 import React, { useEffect, useState } from "react";
@@ -15,8 +17,10 @@ import {
   leaveRoom,
   verifyUserForRoom,
 } from "../../api/routes/rooms";
+import { fetchMe } from "../../api/routes/users";
 import { Container } from "../../components/Container";
 import { Hero } from "../../components/Hero";
+import { Chat } from "../../components/rooms/Chat";
 import { JoinRoomPage } from "../../components/rooms/JoinRoomPage";
 import { codeMirrorModes } from "../../constants";
 import { requireSSRCodeMirror } from "../../utils/requireSSRCodeMirror";
@@ -42,32 +46,43 @@ const Room = () => {
       cacheTime: 0,
     }
   );
+  const { data: meData } = useQuery("me", fetchMe);
 
   const { colorMode } = useColorMode();
+  const toast = useToast();
   const [content, setContent] = useState<string>();
+  const [verified, setVerified] = useState<boolean>(false);
   const [indent, setIndent] = useState<number>(4);
   const [language, setLanguage] = useState<string>();
   const [keybinding, setKeybinding] = useState<string>("default");
   const [docLoaded, setDocLoaded] = useState<boolean>(false);
   const [room, setRoom] = useState<RoomProps>();
-  const [socket, setSocket] = useState<
-    Socket<DefaultEventsMap, DefaultEventsMap>
-  >();
+  const [socket, setSocket] = useState<Socket<
+    DefaultEventsMap,
+    DefaultEventsMap
+  > | null>(null);
 
   // Socket + room setup
   useEffect(() => {
-    if (id === "-1") return;
+    if (id === "-1" || !verified) return;
 
     const soc = io(process.env.NEXT_PUBLIC_API_URL as string, {
-      query: { roomId: id },
+      query: { roomId: id, username: meData?.data.username },
     });
     setSocket(soc);
 
     return () => {
       soc.disconnect();
       leaveRoom(id).catch((err) => console.log(err));
+      setVerified(false);
+      setSocket(null);
     };
-  }, [id]);
+  }, [id, verified]);
+
+  // Room content setup
+  useEffect(() => {
+    setVerified(verifiedData?.data.verified);
+  }, [verifiedData]);
 
   // Room content setup
   useEffect(() => {
@@ -102,6 +117,30 @@ const Room = () => {
     };
   }, [socket, content]);
 
+  // User communications
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on("user-join", (username) => {
+      toast({
+        title: `User "${username}" joined the room`,
+        status: "info",
+        position: "bottom-left",
+        duration: 2000,
+        isClosable: true,
+      });
+    });
+    socket.on("user-leave", (username) => {
+      toast({
+        title: `User "${username}" left the room`,
+        status: "info",
+        duration: 2000,
+        position: "bottom-left",
+        isClosable: true,
+      });
+    });
+  }, [socket]);
+
   if (isError) {
     return (
       <Container height="100vh">
@@ -118,7 +157,7 @@ const Room = () => {
     );
   }
 
-  if (!verifiedData?.data.verified) {
+  if (!verified) {
     return (
       <Container height="100vh">
         <JoinRoomPage roomId={id} room={room} />
@@ -166,7 +205,9 @@ const Room = () => {
         }}
       >
         {codeMirrorModes.map((mode) => (
-          <option value={mode}>{mode}</option>
+          <option key={mode} value={mode}>
+            {mode}
+          </option>
         ))}
       </Select>
       <Select
@@ -180,6 +221,7 @@ const Room = () => {
         <option value="vim">vim</option>
         <option value="emacs">emacs</option>
       </Select>
+      {socket ? <Chat socket={socket} /> : null}
     </Container>
   );
 };
