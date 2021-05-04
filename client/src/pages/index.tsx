@@ -13,19 +13,19 @@ const Index = () => (
       sharing platform, utilize powerful functionalities along with our simple
       and intuitive interface.
     </Text>
-    <Flex align="center">
+    <Flex align="center" pt={12}>
       <Heading>{`</>`}</Heading>
-      <Text fontSize="larger" pt={12} pl={8}>
+      <Text fontSize="larger" pl={8}>
         Choose from over 100 languages to give your code all your syntax
         highlighting needs as you type. Change the theme of your platform from
         light to dark, depending on your preference and needs.
       </Text>
     </Flex>
-    <Flex align="center">
+    <Flex align="center" pt={12}>
       <Heading>
         <Search2Icon />
       </Heading>
-      <Text m="auto" fontSize="larger" pt={12} pl={16}>
+      <Text m="auto" fontSize="larger" pl={16}>
         Create private or public rooms for free, host a code party, invite
         friends! Use discourse to find rooms under our platform, discover and
         chat with new people in large public rooms.
