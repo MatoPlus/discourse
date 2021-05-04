@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/button";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
-import { Flex, Heading, Link as ChakraLink } from "@chakra-ui/layout";
+import { Flex, Heading, Link as ChakraLink, Text } from "@chakra-ui/layout";
 import { Spinner, useDisclosure } from "@chakra-ui/react";
 import { chakra } from "@chakra-ui/system";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table";
@@ -79,7 +79,7 @@ const Rooms = () => {
 
   if (isLoading) {
     return (
-      <Container height="100vh">
+      <Container>
         <Spinner size="xl" m="auto" />
       </Container>
     );
@@ -87,11 +87,16 @@ const Rooms = () => {
 
   return (
     <>
-      <Container height="100vh">
-        <Heading p={4} mr="auto" size="2xl">
-          Rooms
+      <Container variant="large">
+        <Heading p={4} textAlign="center" size="2xl">
+          <Text as="samp">Rooms</Text>
         </Heading>
-        <Flex ml="auto">
+        <Flex justifyContent="flex-end">
+          <Link href="/rooms/create">
+            <Button m={2} as={ChakraLink} colorScheme="teal">
+              create room
+            </Button>
+          </Link>
           <Button
             m={2}
             onClick={() => queryClient.invalidateQueries("rooms")}
@@ -99,11 +104,6 @@ const Rooms = () => {
           >
             refresh
           </Button>
-          <Link href="/rooms/create">
-            <Button m={2} as={ChakraLink} colorScheme="teal">
-              create room
-            </Button>
-          </Link>
         </Flex>
         <Table {...getTableProps()}>
           <Thead>

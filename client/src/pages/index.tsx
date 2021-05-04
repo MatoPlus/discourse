@@ -1,50 +1,38 @@
-import {
-  Link as ChakraLink,
-  Text,
-  Code,
-  List,
-  ListIcon,
-  ListItem,
-} from "@chakra-ui/react";
-import { CheckCircleIcon, LinkIcon } from "@chakra-ui/icons";
-
-import { Hero } from "../components/Hero";
+import { Search2Icon } from "@chakra-ui/icons";
+import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 import { Container } from "../components/Container";
-import { Main } from "../components/Main";
 import { Footer } from "../components/Footer";
+import { Hero } from "../components/Hero";
 
 const Index = () => (
-  <Container height="100vh">
-    <Hero title={"discourse"} />
-    <Main>
-      <Text>
-        Create and code together with discourse. Made with <Code>Next.js</Code>{" "}
-        + <Code>chakra-ui</Code> + <Code>typescript</Code>.
+  <Container>
+    <Hero />
+    <Text m="auto" w="50vw" fontSize="2xl" pb="25vh">
+      Code, collaborate, and chat together with discouse. The discourse platform
+      that offers real-time, cooperative code rooms. Go beyond the generic code
+      sharing platform, utilize powerful functionalities along with our simple
+      and intuitive interface.
+    </Text>
+    <Flex align="center">
+      <Heading>{`</>`}</Heading>
+      <Text fontSize="larger" pt={12} pl={8}>
+        Choose from over 100 languages to give your code all your syntax
+        highlighting needs as you type. Change the theme of your platform from
+        light to dark, depending on your preference and needs.
       </Text>
-
-      <List spacing={3} my={0}>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink
-            isExternal
-            href="https://chakra-ui.com"
-            flexGrow={1}
-            mr={2}
-          >
-            Chakra UI <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink isExternal href="https://nextjs.org" flexGrow={1} mr={2}>
-            Next.js <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-      </List>
-    </Main>
-
+    </Flex>
+    <Flex align="center">
+      <Heading>
+        <Search2Icon />
+      </Heading>
+      <Text m="auto" fontSize="larger" pt={12} pl={16}>
+        Create private or public rooms for free, host a code party, invite
+        friends! Use discourse to find rooms under our platform, discover and
+        chat with new people in large public rooms.
+      </Text>
+    </Flex>
     <Footer>
-      <Text>- Terms and Conditions -</Text>
+      <Text m="auto">Copyright © discourse 2021</Text>
     </Footer>
   </Container>
 );

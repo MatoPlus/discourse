@@ -30,8 +30,6 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
   onClose,
   cancelRef,
 }) => {
-  // I think we can have the button call the enter room endpoint with a password field
-  // On success, we push to the room id and let the room logic handle redirection...
   const router = useRouter();
   const toast = useToast();
 
@@ -46,7 +44,7 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
       <AlertDialogOverlay />
 
       <AlertDialogContent>
-        <AlertDialogHeader>{`Join room - "${room.name}"?`}</AlertDialogHeader>
+        <AlertDialogHeader>{`Join "${room.name}"?`}</AlertDialogHeader>
         <AlertDialogCloseButton />
         <AlertDialogBody>
           {`Users: ${room.currentUsers.length}/${room.maxUsers}`}

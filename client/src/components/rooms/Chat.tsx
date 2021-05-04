@@ -8,7 +8,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io-client/build/typed-events";
 import { InputField } from "../InputField";
@@ -60,6 +60,7 @@ export const Chat: React.FC<ChatProps> = ({ socket }) => {
             bg={chatBoxColor}
             bottom={4}
             right={4}
+            zIndex={2}
             padding="4"
           >
             <Flex align="center" pb={2}>

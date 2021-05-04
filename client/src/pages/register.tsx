@@ -11,7 +11,7 @@ const Register = () => {
   const router = useRouter();
 
   return (
-    <Container height="100vh">
+    <Container>
       <Box m="auto">
         <Formik
           initialValues={{ username: "", email: "", password: "" }}

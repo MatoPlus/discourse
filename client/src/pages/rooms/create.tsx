@@ -12,7 +12,7 @@ const CreateRoom = () => {
   useIsAuth();
   const router = useRouter();
   return (
-    <Container height="100vh">
+    <Container>
       <Box m="auto">
         <Formik
           initialValues={{ name: "", maxUsers: 1, password: "" }}

@@ -1,29 +1,24 @@
-import { Flex, useColorMode, FlexProps, Box } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import React from "react";
 import { Navigation } from "./Navigation";
+import { Wrapper, WrapperVariant } from "./Wrapper";
 
 type ContainerProps = {
   disableStickyNav?: boolean;
-} & FlexProps;
+  variant?: WrapperVariant;
+  isSingleView?: boolean;
+};
 
 export const Container: React.FC<ContainerProps> = ({
-  disableStickyNav,
-  ...props
+  children,
+  disableStickyNav = false,
+  variant = "regular",
+  isSingleView = false,
 }) => {
-  const { colorMode } = useColorMode();
-
-  const bgColor = { light: "gray.50", dark: "gray.900" };
-  const color = { light: "black", dark: "white" };
   return (
-    <Box>
-      <Navigation disableSticky={!!disableStickyNav} />
-      <Flex
-        direction="column"
-        alignItems="center"
-        justifyContent="flex-start"
-        bg={bgColor[colorMode]}
-        color={color[colorMode]}
-        {...props}
-      />
+    <Box height={isSingleView ? "100vh" : undefined}>
+      <Navigation disableSticky={disableStickyNav} />
+      <Wrapper variant={variant}>{children}</Wrapper>
     </Box>
   );
 };

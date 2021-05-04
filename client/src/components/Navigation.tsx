@@ -21,7 +21,7 @@ export const Navigation: React.FC<NavigationProps> = ({ disableSticky }) => {
   const { data, error } = useQuery("me", fetchMe, {
     retry: 2,
   });
-  const color = useColorModeValue("gray.100", "gray.800");
+  const color = useColorModeValue("gray.50", "gray.900");
 
   let body;
 
@@ -64,7 +64,7 @@ export const Navigation: React.FC<NavigationProps> = ({ disableSticky }) => {
       p={3}
       bg={color}
     >
-      <Flex flex={1} m="auto" align="center" maxW={800}>
+      <Flex flex={1} m="auto" align="center" maxW="60vw">
         <Link href="/">
           <ChakraLink>
             <Heading>discourse</Heading>

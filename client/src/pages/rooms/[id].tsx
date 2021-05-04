@@ -1,6 +1,6 @@
 import { useColorMode } from "@chakra-ui/color-mode";
 import { useDisclosure } from "@chakra-ui/hooks";
-import { Box, Heading, Text } from "@chakra-ui/layout";
+import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
 import { Select } from "@chakra-ui/select";
 import { Spinner } from "@chakra-ui/spinner";
 import { useToast } from "@chakra-ui/toast";
@@ -143,15 +143,22 @@ const Room = () => {
 
   if (isError) {
     return (
-      <Container height="100vh">
-        <Hero title="Room not found"></Hero>
+      <Container>
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          height="100vh"
+          direction="column"
+        >
+          <Heading fontSize="6vw">Room Not Found</Heading>
+        </Flex>
       </Container>
     );
   }
 
   if (isLoading || !room) {
     return (
-      <Container height="100vh">
+      <Container>
         <Spinner size="xl" m="auto" />
       </Container>
     );
@@ -159,15 +166,52 @@ const Room = () => {
 
   if (!verified) {
     return (
-      <Container height="100vh">
+      <Container>
         <JoinRoomPage roomId={id} room={room} />
       </Container>
     );
   }
 
   return (
-    <Container height="100vh" disableStickyNav>
-      <Box width="100%" padding={5}>
+    <Container disableStickyNav isSingleView variant="large">
+      <Box width="100%" px={3} pb={2}>
+        <Flex justifyContent="flex-end" align="center" pb={2}>
+          <Heading px={3} size="md" mr="auto">
+            {room.name}
+          </Heading>
+          <Text pr={2}>Language: </Text>
+          <Select
+            size="sm"
+            width={150}
+            name="language"
+            value={language}
+            onChange={(event) => {
+              const newLanguage = event.target.value;
+              if (socket) {
+                socket.emit("send-mode-change", newLanguage);
+                setLanguage(newLanguage);
+              }
+            }}
+          >
+            {codeMirrorModes.map((mode) => (
+              <option key={mode} value={mode}>
+                {mode}
+              </option>
+            ))}
+          </Select>
+          <Text p={2}>Key Binding: </Text>
+          <Select
+            size="sm"
+            width={150}
+            name="keybinding"
+            value={keybinding}
+            onChange={(event) => setKeybinding(event.target.value)}
+          >
+            <option value="default">default</option>
+            <option value="vim">vim</option>
+            <option value="emacs">emacs</option>
+          </Select>
+        </Flex>
         <CodeMirror
           onBeforeChange={(editor, data, value) => {
             if (socket) {
@@ -188,40 +232,9 @@ const Room = () => {
           }}
         />
       </Box>
-      <Heading pl={5} mr="auto" size="lg">
-        {room.name}
-      </Heading>
-      <Select
-        size="sm"
-        width={150}
-        name="language"
-        value={language}
-        onChange={(event) => {
-          const newLanguage = event.target.value;
-          if (socket) {
-            socket.emit("send-mode-change", newLanguage);
-            setLanguage(newLanguage);
-          }
-        }}
-      >
-        {codeMirrorModes.map((mode) => (
-          <option key={mode} value={mode}>
-            {mode}
-          </option>
-        ))}
-      </Select>
-      <Select
-        size="sm"
-        width={150}
-        name="keybinding"
-        value={keybinding}
-        onChange={(event) => setKeybinding(event.target.value)}
-      >
-        <option value="default">default</option>
-        <option value="vim">vim</option>
-        <option value="emacs">emacs</option>
-      </Select>
-      {socket ? <Chat socket={socket} /> : null}
+      <Flex px={3} mr="auto" align="center">
+        {socket ? <Chat socket={socket} /> : null}
+      </Flex>
     </Container>
   );
 };

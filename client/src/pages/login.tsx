@@ -13,7 +13,7 @@ const Login = () => {
   const router = useRouter();
 
   return (
-    <Container height="100vh">
+    <Container>
       <Box m="auto">
         <Formik
           initialValues={{ usernameOrEmail: "", password: "" }}
