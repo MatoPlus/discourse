@@ -14,7 +14,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     refreshAccessToken().then(async (response) => {
       const { accessToken } = await response.data;
-      setAccessToken(accessToken);
+      if (accessToken) {
+        setAccessToken(accessToken);
+      }
     });
   }, []);
 
