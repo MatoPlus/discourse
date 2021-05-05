@@ -19,9 +19,7 @@ export const getRooms = async (req: Request, res: Response) => {
       .skip(page * recordsPerPage)
       .limit(recordsPerPageWithNextCheck);
     res.json({
-      rooms: recordsPerPage
-        ? rooms.slice(0, recordsPerPageWithNextCheck)
-        : rooms,
+      rooms: recordsPerPage ? rooms.slice(0, recordsPerPage) : rooms,
       hasMore: rooms.length === recordsPerPageWithNextCheck,
     });
   } catch (err) {
@@ -122,7 +120,87 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
       hasPassword: !!req.body.password,
     });
     await room.save();
-    return res.status(201).json(room);
+    return res.status(201).json({ _id: room.id });
+  } catch (err) {
+    return res.status(409).json({ message: err.message });
+  }
+};
+
+export const editRoom = async (req: AuthRequest, res: Response) => {
+  const { error } = createRoomSchema.validate(req.body);
+  if (error) {
+    return res.status(409).json({
+      errors: error.details.map(
+        (detail) => new FieldError(detail.path[0] as string, detail.message)
+      ),
+    });
+  }
+
+  const user = await User.findOne({ _id: (req.user as any)._id });
+
+  if (!user) {
+    return res.status(401).json({ message: "Current user not found" });
+  }
+
+  const room = await Room.findOne({ _id: req.params.id });
+
+  if (!room) {
+    return res.status(401).json({ message: "Room not found" });
+  }
+
+  if (user.username !== room.host) {
+    return res
+      .status(401)
+      .json({ errors: [new Status("Cannot edit other user's room")] });
+  }
+
+  try {
+    room.name = req.body.name;
+
+    // Pop users until maxUsers matches currentUsers
+    const maxUsers = room.maxUsers;
+    const newMaxUsers = req.body.maxUsers;
+
+    if (newMaxUsers < maxUsers) {
+      for (let i = 0; i < maxUsers - newMaxUsers; ++i) {
+        room.currentUsers.pop();
+      }
+    }
+    room.maxUsers = req.body.maxUsers;
+
+    room.hashedPassword = req.body.password
+      ? await argon2.hash(req.body.password)
+      : undefined;
+    room.hasPassword = !!req.body.password;
+    await room.save();
+    return res.status(200).json({ _id: room.id });
+  } catch (err) {
+    return res.status(409).json({ message: err.message });
+  }
+};
+
+export const deleteRoom = async (req: AuthRequest, res: Response) => {
+  const user = await User.findOne({ _id: (req.user as any)._id });
+
+  if (!user) {
+    return res.status(401).json({ message: "Current user not found" });
+  }
+
+  const room = await Room.findOne({ _id: req.params.id });
+
+  if (!room) {
+    return res.status(401).json({ message: "Room not found" });
+  }
+
+  if (user.username !== room.host) {
+    return res
+      .status(401)
+      .json({ message: "User cannot delete other user's room" });
+  }
+
+  try {
+    await Room.deleteOne({ _id: room.id });
+    return res.status(200).json({ _id: room.id });
   } catch (err) {
     return res.status(409).json({ message: err.message });
   }

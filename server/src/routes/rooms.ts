@@ -7,6 +7,8 @@ import {
   enterRoom,
   leaveRoom,
   verifyUser,
+  deleteRoom,
+  editRoom,
 } from "../controllers/rooms";
 
 const router = express.Router();
@@ -14,6 +16,10 @@ const router = express.Router();
 router.get("/", getRooms);
 
 router.get("/:id", getRoom);
+
+router.delete("/:id", authorize, deleteRoom);
+
+router.patch("/:id", authorize, editRoom);
 
 router.post("/", authorize, createRoom);
 
