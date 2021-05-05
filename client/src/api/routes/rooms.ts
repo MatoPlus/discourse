@@ -11,6 +11,17 @@ export const fetchRooms = (
 export const fetchRoom = (id: string) =>
   axios.get(`${path}/${id}`, { withCredentials: true });
 
+export const editRoom = (
+  id: string,
+  room: {
+    name: string;
+    maxUsers: number;
+    password?: string;
+  }
+) => axios.patch(`${path}/${id}`, room);
+
+export const deleteRoom = (id: string) => axios.delete(`${path}/${id}`);
+
 export const createRoom = (room: {
   name: string;
   maxUsers: number;

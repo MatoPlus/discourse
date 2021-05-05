@@ -15,7 +15,7 @@ const ChangePassword = () => {
   const [tokenError, setTokenError] = useState("");
 
   return (
-    <Container>
+    <Container isCenter>
       <Box m="auto">
         <Formik
           initialValues={{ password: "", confirm: "" }}

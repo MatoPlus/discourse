@@ -10,7 +10,7 @@ import { getErrorMap } from "../../utils/getErrorMap";
 const Recover = () => {
   const [requested, setRequested] = useState(false);
   return (
-    <Container>
+    <Container isCenter>
       <Box m="auto">
         <Formik
           initialValues={{ email: "" }}

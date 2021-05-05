@@ -15,6 +15,7 @@ import React from "react";
 import { enterRoom } from "../api/routes/rooms";
 import { RoomProps } from "../pages/rooms";
 import { getErrorMap } from "../utils/getErrorMap";
+import { setErrorStatusToast } from "../utils/setErrorStatusToast";
 import { InputField } from "./InputField";
 
 type JoinRoomDialogProps = {
@@ -55,17 +56,7 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
             onSubmit={async (values, { setErrors, setSubmitting }) => {
               const response = await enterRoom(room._id, values).catch(
                 (err) => {
-                  (err.response.data.errors as string[]).forEach((error) => {
-                    if ((error as any).status) {
-                      toast({
-                        title: (error as any).status,
-                        status: "error",
-                        duration: 2000,
-                        position: "bottom-left",
-                        isClosable: true,
-                      });
-                    }
-                  });
+                  setErrorStatusToast(err.response.data.errors, toast);
                   setErrors(getErrorMap(err.response.data.errors));
                 }
               );

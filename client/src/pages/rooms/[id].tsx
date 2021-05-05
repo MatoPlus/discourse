@@ -159,7 +159,7 @@ const Room = () => {
 
   if (!verified) {
     return (
-      <Container>
+      <Container isCenter>
         <JoinRoomPage roomId={id} room={room} />
       </Container>
     );
