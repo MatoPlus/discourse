@@ -1,8 +1,12 @@
+import { defaultRecordsPerPage } from "../../constants";
 import axios from "../baseAxios";
 
 const path = "/rooms";
 
-export const fetchRooms = () => axios.get(path);
+export const fetchRooms = (
+  page: number,
+  recordsPerPage: number = defaultRecordsPerPage
+) => axios.get(path, { params: { page, recordsPerPage } });
 
 export const fetchRoom = (id: string) =>
   axios.get(`${path}/${id}`, { withCredentials: true });

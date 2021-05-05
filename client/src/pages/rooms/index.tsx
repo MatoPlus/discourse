@@ -1,7 +1,20 @@
 import { Button } from "@chakra-ui/button";
-import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
-import { Flex, Heading, Link as ChakraLink, Text } from "@chakra-ui/layout";
-import { Spinner, useDisclosure } from "@chakra-ui/react";
+import {
+  AddIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  RepeatIcon,
+  TriangleDownIcon,
+  TriangleUpIcon,
+} from "@chakra-ui/icons";
+import {
+  Box,
+  Flex,
+  Heading,
+  Link as ChakraLink,
+  Text,
+} from "@chakra-ui/layout";
+import { Tooltip, useDisclosure } from "@chakra-ui/react";
 import { chakra } from "@chakra-ui/system";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table";
 import Link from "next/link";
@@ -24,8 +37,15 @@ export interface RoomProps {
 }
 
 const Rooms = () => {
-  const { data: roomData, isLoading } = useQuery("rooms", fetchRooms);
-  const rooms = roomData?.data.rooms as [RoomProps];
+  const [page, setPage] = useState(0);
+
+  // Look at specific useQuery for pagination (infinite query)
+  const { data: roomData, isLoading, isPreviousData } = useQuery(
+    ["rooms", page],
+    () => fetchRooms(page)
+  );
+  let rooms = roomData?.data.rooms as RoomProps[];
+  let hasMore = roomData?.data.hasMore as boolean;
 
   const data = useMemo<(RoomProps & { activeUsers: string })[]>(() => {
     if (!rooms) return [];
@@ -77,33 +97,32 @@ const Rooms = () => {
     mode: "",
   });
 
-  if (isLoading) {
-    return (
-      <Container>
-        <Spinner size="xl" m="auto" />
-      </Container>
-    );
-  }
-
   return (
     <>
-      <Container variant="large">
-        <Heading p={4} textAlign="center" size="2xl">
+      <Container variant="large" isLoading={isLoading}>
+        <Heading textAlign="center" size="lg">
           <Text as="samp">Rooms</Text>
         </Heading>
         <Flex justifyContent="flex-end">
-          <Link href="/rooms/create">
-            <Button m={2} as={ChakraLink} colorScheme="teal">
-              create room
+          <Tooltip label="Create room">
+            <Box>
+              <Link href="/rooms/create">
+                <Button m={2} as={ChakraLink} colorScheme="teal" size="sm">
+                  <AddIcon />
+                </Button>
+              </Link>
+            </Box>
+          </Tooltip>
+          <Tooltip label="Refresh rooms">
+            <Button
+              m={2}
+              onClick={() => queryClient.invalidateQueries("rooms")}
+              colorScheme="teal"
+              size="sm"
+            >
+              <RepeatIcon />
             </Button>
-          </Link>
-          <Button
-            m={2}
-            onClick={() => queryClient.invalidateQueries("rooms")}
-            colorScheme="teal"
-          >
-            refresh
-          </Button>
+          </Tooltip>
         </Flex>
         <Table {...getTableProps()}>
           <Thead>
@@ -160,6 +179,34 @@ const Rooms = () => {
             })}
           </Tbody>
         </Table>
+        <Tooltip label="Previous page">
+          <Button
+            m={2}
+            onClick={async () => {
+              setPage((old) => Math.max(old - 1, 0));
+            }}
+            colorScheme="teal"
+            disabled={page === 0}
+            size="sm"
+          >
+            <ChevronLeftIcon />
+          </Button>
+        </Tooltip>
+        <Tooltip label="Next page">
+          <Button
+            m={2}
+            onClick={async () => {
+              if (!isPreviousData && hasMore) {
+                setPage((old) => old + 1);
+              }
+            }}
+            colorScheme="teal"
+            disabled={isPreviousData || !hasMore}
+            size="sm"
+          >
+            <ChevronRightIcon />
+          </Button>
+        </Tooltip>
       </Container>
 
       <JoinRoomDialog

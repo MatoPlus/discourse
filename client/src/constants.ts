@@ -1,3 +1,5 @@
+export const defaultRecordsPerPage = 8;
+
 // mode info in meta.js from codemirror
 export const codeMirrorModes = [
   "apl",

@@ -1,8 +1,6 @@
 import { useColorMode } from "@chakra-ui/color-mode";
-import { useDisclosure } from "@chakra-ui/hooks";
 import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
 import { Select } from "@chakra-ui/select";
-import { Spinner } from "@chakra-ui/spinner";
 import { useToast } from "@chakra-ui/toast";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/solarized.css";
@@ -19,7 +17,6 @@ import {
 } from "../../api/routes/rooms";
 import { fetchMe } from "../../api/routes/users";
 import { Container } from "../../components/Container";
-import { Hero } from "../../components/Hero";
 import { Chat } from "../../components/rooms/Chat";
 import { JoinRoomPage } from "../../components/rooms/JoinRoomPage";
 import { codeMirrorModes } from "../../constants";
@@ -157,11 +154,7 @@ const Room = () => {
   }
 
   if (isLoading || !room) {
-    return (
-      <Container>
-        <Spinner size="xl" m="auto" />
-      </Container>
-    );
+    return <Container isLoading={true}></Container>;
   }
 
   if (!verified) {
@@ -173,7 +166,12 @@ const Room = () => {
   }
 
   return (
-    <Container disableStickyNav isSingleView variant="large">
+    <Container
+      disableStickyNav
+      isSingleView
+      variant="large"
+      isLoading={isLoading || !room}
+    >
       <Box width="100%" px={3} pb={2}>
         <Flex justifyContent="flex-end" align="center" pb={2}>
           <Heading px={3} size="md" mr="auto">
