@@ -8,11 +8,21 @@ import { createRoomSchema } from "../schemas/schema";
 import AuthRequest from "../types/AuthRequest";
 import RoomDocument from "../types/RoomDocument";
 
-export const getRooms = async (_: Request, res: Response) => {
+export const getRooms = async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 0;
+  const recordsPerPage = parseInt(req.query.recordsPerPage as string);
+  const recordsPerPageWithNextCheck = recordsPerPage + 1;
   try {
-    let rooms = await Room.find().select({ hashedPassword: 0, content: 0 });
+    let rooms = await Room.find()
+      .select({ hashedPassword: 0, content: 0 })
+      .sort("-createdAt")
+      .skip(page * recordsPerPage)
+      .limit(recordsPerPageWithNextCheck);
     res.json({
-      rooms: rooms,
+      rooms: recordsPerPage
+        ? rooms.slice(0, recordsPerPageWithNextCheck)
+        : rooms,
+      hasMore: rooms.length === recordsPerPageWithNextCheck,
     });
   } catch (err) {
     res.status(404).json({ message: err.message });
