@@ -9,9 +9,9 @@ const Index = () => (
     <Hero />
     <Text m="auto" w="50vw" fontSize="2xl" pb="25vh">
       Code, collaborate, and chat together with discouse. The discourse platform
-      that offers real-time, cooperative code rooms. Go beyond the generic code
-      sharing platform, utilize powerful functionalities along with our simple
-      and intuitive interface.
+      offers real-time, cooperative code rooms. Go beyond generic code sharing
+      platforms, utilize powerful functionalities along with our simple and
+      intuitive interface.
     </Text>
     <Flex align="center" pt={12}>
       <Heading>{`</>`}</Heading>
