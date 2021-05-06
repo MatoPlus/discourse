@@ -79,7 +79,7 @@ const main = async () => {
   app.use("/users", userRoutes);
   app.use("/auth", authRoutes);
 
-  await mongoose.connect(process.env.DATABASE_URL, {
+  await mongoose.connect(process.env.DATABASE_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
