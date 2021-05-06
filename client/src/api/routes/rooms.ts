@@ -5,8 +5,9 @@ const path = "/rooms";
 
 export const fetchRooms = (
   page: number,
-  recordsPerPage: number = defaultRecordsPerPage
-) => axios.get(path, { params: { page, recordsPerPage } });
+  recordsPerPage: number = defaultRecordsPerPage,
+  filter: string = ""
+) => axios.get(path, { params: { page, recordsPerPage, filter } });
 
 export const fetchRoom = (id: string) =>
   axios.get(`${path}/${id}`, { withCredentials: true });

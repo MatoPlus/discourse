@@ -7,6 +7,7 @@ import { useQuery } from "react-query";
 import { editRoom, fetchRoom } from "../../../api/routes/rooms";
 import { Container } from "../../../components/Container";
 import { InputField } from "../../../components/InputField";
+import { PageSpinner } from "../../../components/PageSpinner";
 import { getErrorMap } from "../../../utils/getErrorMap";
 import { setErrorStatusToast } from "../../../utils/setErrorStatusToast";
 import { useGetId } from "../../../utils/useGetId";
@@ -25,7 +26,7 @@ const EditRoom = () => {
   );
 
   if (isLoading) {
-    return <Container isLoading></Container>;
+    return <PageSpinner />;
   }
 
   if (isError) {

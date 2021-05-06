@@ -5,6 +5,7 @@ import {
   ChevronRightIcon,
   LockIcon,
   RepeatIcon,
+  SearchIcon,
   TriangleDownIcon,
   TriangleUpIcon,
 } from "@chakra-ui/icons";
@@ -12,6 +13,7 @@ import { Flex, Heading, Link as ChakraLink, Text } from "@chakra-ui/layout";
 import { useDisclosure } from "@chakra-ui/react";
 import { chakra } from "@chakra-ui/system";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table";
+import { Form, Formik } from "formik";
 import Link from "next/link";
 import React, { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
@@ -19,6 +21,7 @@ import { Column, useSortBy, useTable } from "react-table";
 import { fetchRooms } from "../../api/routes/rooms";
 import { Container } from "../../components/Container";
 import { EditDeleteRoomButtons } from "../../components/EditDeleteRoomButtons";
+import { InputField } from "../../components/InputField";
 import { JoinRoomDialog } from "../../components/JoinRoomDialog";
 
 export interface RoomProps {
@@ -35,11 +38,12 @@ export interface RoomProps {
 
 const Rooms = () => {
   const [page, setPage] = useState(0);
+  const [filter, setFilter] = useState("");
 
   // Look at specific useQuery for pagination (infinite query)
-  const { data: roomData, isLoading, isPreviousData } = useQuery(
-    ["rooms", page],
-    () => fetchRooms(page)
+  const { data: roomData, isPreviousData } = useQuery(
+    ["rooms", page, filter],
+    () => fetchRooms(page, undefined, filter)
   );
   let rooms = roomData?.data.rooms as RoomProps[];
   let hasMore = roomData?.data.hasMore as boolean;
@@ -97,29 +101,52 @@ const Rooms = () => {
 
   return (
     <>
-      <Container variant="large" isLoading={isLoading}>
+      <Container variant="large">
         <Heading textAlign="center" size="lg">
           <Text as="samp">Rooms</Text>
         </Heading>
-        <Flex justifyContent="flex-end">
-          <Link href="/rooms/create">
+        <Flex mt={2}>
+          <Formik
+            initialValues={{ filter: "" }}
+            onSubmit={async (values) => {
+              setFilter(values.filter);
+              setPage(0);
+            }}
+          >
+            <Form>
+              <Flex align="center">
+                <InputField name="filter" placeholder="search room" />
+                <IconButton
+                  type="submit"
+                  m={2}
+                  aria-label="Create room"
+                  colorScheme="teal"
+                  size="sm"
+                  icon={<SearchIcon />}
+                />
+              </Flex>
+            </Form>
+          </Formik>
+          <Flex justifyContent="flex-end" ml="auto">
+            <Link href="/rooms/create">
+              <IconButton
+                m={2}
+                as={ChakraLink}
+                aria-label="Create room"
+                colorScheme="teal"
+                size="sm"
+                icon={<AddIcon />}
+              />
+            </Link>
             <IconButton
               m={2}
-              as={ChakraLink}
-              aria-label="Create room"
+              onClick={() => queryClient.invalidateQueries("rooms")}
               colorScheme="teal"
               size="sm"
-              icon={<AddIcon />}
+              aria-label="Refresh rooms"
+              icon={<RepeatIcon />}
             />
-          </Link>
-          <IconButton
-            m={2}
-            onClick={() => queryClient.invalidateQueries("rooms")}
-            colorScheme="teal"
-            size="sm"
-            aria-label="Refresh rooms"
-            icon={<RepeatIcon />}
-          />
+          </Flex>
         </Flex>
         <Table {...getTableProps()}>
           <Thead>

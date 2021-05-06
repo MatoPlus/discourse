@@ -18,6 +18,7 @@ import {
 import { fetchMe } from "../../api/routes/users";
 import { Container } from "../../components/Container";
 import { EditDeleteRoomButtons } from "../../components/EditDeleteRoomButtons";
+import { PageSpinner } from "../../components/PageSpinner";
 import { Chat } from "../../components/rooms/Chat";
 import { JoinRoomPage } from "../../components/rooms/JoinRoomPage";
 import { codeMirrorModes } from "../../constants";
@@ -150,7 +151,7 @@ const Room = () => {
   }
 
   if (isLoading || !room) {
-    return <Container isLoading={true}></Container>;
+    return <PageSpinner />;
   }
 
   if (!verified) {
@@ -162,12 +163,7 @@ const Room = () => {
   }
 
   return (
-    <Container
-      disableStickyNav
-      isSingleView
-      variant="large"
-      isLoading={isLoading || !room}
-    >
+    <Container disableStickyNav isSingleView variant="large">
       <Box width="100%" px={3} pb={2}>
         <Flex justifyContent="flex-end" align="center" pb={2}>
           <Flex mr="auto" align="center">
