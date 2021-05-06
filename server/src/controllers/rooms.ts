@@ -32,7 +32,14 @@ export const getRoom = async (req: Request, res: Response) => {
     const room = await Room.findOne({ _id: req.params.id }).select({
       hashedPassword: 0,
     });
-    return res.json(room || {});
+
+    if (!room) {
+      return res
+        .status(404)
+        .json({ errors: [new FieldError("_id", "Room not found")] });
+    }
+
+    return res.json(room);
   } catch (err) {
     return res
       .status(404)
@@ -113,6 +120,7 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
     const room: RoomDocument = new Room({
       host: user.username,
       name: req.body.name,
+      description: req.body.description,
       maxUsers: req.body.maxUsers,
       hashedPassword: req.body.password
         ? await argon2.hash(req.body.password)
@@ -168,6 +176,7 @@ export const editRoom = async (req: AuthRequest, res: Response) => {
     }
     room.maxUsers = req.body.maxUsers;
 
+    room.description = req.body.description;
     room.hashedPassword = req.body.password
       ? await argon2.hash(req.body.password)
       : undefined;
