@@ -4,7 +4,10 @@ import { Select } from "@chakra-ui/select";
 import { useToast } from "@chakra-ui/toast";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/solarized.css";
+import { Editor } from "codemirror";
 import React, { useEffect, useState } from "react";
+import * as Y from "yjs";
+import { WebsocketProvider } from "y-websocket";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import { useQuery } from "react-query";
 import { io, Socket } from "socket.io-client";
@@ -24,6 +27,12 @@ import { JoinRoomPage } from "../../components/rooms/JoinRoomPage";
 import { codeMirrorModes } from "../../constants";
 import { requireSSRCodeMirror } from "../../utils/requireSSRCodeMirror";
 import { useGetId } from "../../utils/useGetId";
+
+let CodemirrorBindingClient: any = null;
+if (typeof window !== "undefined" && typeof window.navigator !== "undefined") {
+  let YCodemirror = require("y-codemirror");
+  CodemirrorBindingClient = YCodemirror.CodemirrorBinding;
+}
 
 // Require all languages, key maps, and themes used for code mirror
 requireSSRCodeMirror();
@@ -49,7 +58,7 @@ const Room = () => {
 
   const { colorMode } = useColorMode();
   const toast = useToast();
-  const [content, setContent] = useState<string>();
+  const [content, setContent] = useState<string>("");
   const [verified, setVerified] = useState<boolean>(false);
   const [indent, setIndent] = useState<number>(4);
   const [language, setLanguage] = useState<string>();
@@ -60,6 +69,7 @@ const Room = () => {
     DefaultEventsMap,
     DefaultEventsMap
   > | null>(null);
+  const editorRef = React.useRef<Editor>();
 
   // Socket + room setup
   useEffect(() => {
@@ -86,18 +96,18 @@ const Room = () => {
   // Room content setup
   useEffect(() => {
     setRoom(roomData?.data);
-    setContent(roomData?.data.content);
     setLanguage(roomData?.data.mode);
     setDocLoaded(true);
+
+    if (editorRef.current) {
+      setContent(roomData?.data.content);
+    }
   }, [roomData]);
 
   // Receiving boardcast from socket
   useEffect(() => {
     if (socket == null) return;
 
-    socket.on("receive-content-change", (value) => {
-      setContent(value);
-    });
     socket.on("receive-mode-change", (language) => {
       setLanguage(language);
     });
@@ -139,6 +149,41 @@ const Room = () => {
       });
     });
   }, [socket]);
+
+  useEffect(() => {
+    if (!editorRef.current || !CodemirrorBindingClient || !verified) return;
+
+    // A Yjs doc holds the shared data
+    const ydoc = new Y.Doc();
+
+    const wsProvider = new WebsocketProvider(
+      process.env.NEXT_PUBLIC_SOCKET_URL as string,
+      id,
+      ydoc
+    );
+
+    // Define a shared text type on the document
+    const yText = ydoc.getText(`codemirror`);
+
+    wsProvider.awareness.setLocalStateField("user", {
+      name: meData?.data.username,
+    });
+
+    // "Bind" the codemirror editor to a Yjs text type.
+    const codemirrorBinding = new CodemirrorBindingClient(
+      yText,
+      editorRef.current,
+      wsProvider.awareness
+    );
+
+    wsProvider.on("status", (event: { status: string }) => {
+      // console.log(event.status);
+    });
+
+    return () => {
+      wsProvider.destroy();
+    };
+  }, [id, verified, editorRef.current, CodemirrorBindingClient]);
 
   if (isError) {
     return (
@@ -206,9 +251,9 @@ const Room = () => {
           </Select>
         </Flex>
         <CodeMirror
+          editorDidMount={(editor) => (editorRef.current = editor)}
           onBeforeChange={(editor, data, value) => {
             if (socket) {
-              socket.emit("send-content-change", value);
               setContent(value);
             }
           }}

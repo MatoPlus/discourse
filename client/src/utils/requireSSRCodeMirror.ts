@@ -6,6 +6,7 @@ export const requireSSRCodeMirror = () => {
     typeof window !== "undefined" &&
     typeof window.navigator !== "undefined"
   ) {
+    require("codemirror");
     codeMirrorModes.forEach((mode) => {
       // require all modes except "null" mode
       if (mode !== "null") {

@@ -30,12 +30,6 @@ const main = async () => {
       socket.broadcast.to(roomId as string).emit("user-join", username);
     }
 
-    socket.on("send-content-change", (value) => {
-      socket.broadcast
-        .to(roomId as string)
-        .emit("receive-content-change", value);
-    });
-
     socket.on("save-content", async (content) => {
       console.log("saved...");
       await Room.findOneAndUpdate(
