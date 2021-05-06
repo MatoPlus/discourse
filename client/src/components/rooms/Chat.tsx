@@ -24,6 +24,7 @@ export const Chat: React.FC<ChatProps> = ({ socket }) => {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const chatBoxColor = useColorModeValue("gray.100", "gray.800");
   const messageBoxColor = useColorModeValue("gray.50", "gray.900");
+  const scrollBarColor = useColorModeValue("gray.200", "gray.700");
 
   // Receiving boardcast from socket
   useEffect(() => {
@@ -67,9 +68,30 @@ export const Chat: React.FC<ChatProps> = ({ socket }) => {
               <Heading size="md">Chat</Heading>
               <CloseButton ml="auto" onClick={onClose} />
             </Flex>
-            <Box h={480} py={2} bg={messageBoxColor} overflowY="scroll">
+            <Box
+              h={480}
+              py={2}
+              bg={messageBoxColor}
+              overflowY="scroll"
+              sx={{
+                "&::-webkit-scrollbar": {
+                  width: "0.25rem",
+                },
+                "&::-webkit-scrollbar-track": {
+                  background: messageBoxColor,
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  background: scrollBarColor,
+                },
+              }}
+            >
               {messages?.map((message: any) => {
-                return <Message key={message.timestamp} {...message} />;
+                return (
+                  <Message
+                    key={message.timestamp + message.value}
+                    {...message}
+                  />
+                );
               })}
             </Box>
             <Formik
