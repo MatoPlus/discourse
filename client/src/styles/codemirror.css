@@ -2,3 +2,26 @@
   resize: vertical;
   min-height: 75vh !important;
 }
+
+.remote-caret {
+  position: absolute;
+  border-left: black;
+  border-left-style: solid;
+  border-left-width: 2px;
+  height: 1em;
+  top: 0.25em;
+}
+.remote-caret > div {
+  position: relative;
+  top: -1em;
+  background-color: rgb(250, 129, 0);
+  font-style: normal;
+  font-weight: normal;
+  line-height: normal;
+  user-select: none;
+  color: white;
+  padding-left: 2px;
+  padding-right: 2px;
+  z-index: 3;
+  opacity: 0.7;
+}
