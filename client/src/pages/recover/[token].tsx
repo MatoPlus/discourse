@@ -25,7 +25,6 @@ const ChangePassword = () => {
             const response = await changePassword(token, values).catch(
               (err) => {
                 const errorMap = getErrorMap(err.response.data.errors);
-                console.log(errorMap);
                 if ("token" in errorMap) {
                   setTokenError(errorMap.token);
                 }

@@ -86,7 +86,6 @@ export const enterRoom = async (req: AuthRequest, res: Response) => {
 
     return res.json(room);
   } catch (err) {
-    console.log(err);
     return res.status(404).json({ errors: [new Status("Invalid room id")] });
   }
 };

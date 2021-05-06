@@ -14,7 +14,6 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
   try {
     payload = verify(refreshToken, process.env.REFRESH_JWT_SECRET);
   } catch (err) {
-    console.log(err);
     return res.send({ ok: false, accessToken: "" });
   }
 

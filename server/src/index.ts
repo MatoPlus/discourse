@@ -20,8 +20,6 @@ const main = async () => {
   });
 
   io.on("connection", (socket) => {
-    console.log("a user has connected");
-
     // Join a code room
     const { roomId, username } = socket.handshake.query;
 
@@ -31,7 +29,6 @@ const main = async () => {
     }
 
     socket.on("save-content", async (content) => {
-      console.log("saved...");
       await Room.findOneAndUpdate(
         { _id: roomId },
         { $set: { content } }
@@ -39,7 +36,6 @@ const main = async () => {
     });
 
     socket.on("send-mode-change", async (language) => {
-      console.log("lang:", language);
       socket.broadcast
         .to(roomId as string)
         .emit("receive-mode-change", language);
@@ -59,7 +55,6 @@ const main = async () => {
 
     // TODO: Add count down to disconnect sockets when no user in room
     socket.on("disconnect", () => {
-      console.log("user disconnected");
       socket.broadcast.to(roomId as string).emit("user-leave", username);
       socket.leave(roomId as string);
     });
