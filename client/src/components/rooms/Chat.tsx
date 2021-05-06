@@ -21,6 +21,7 @@ type ChatProps = {
 export const Chat: React.FC<ChatProps> = ({ socket }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef(null);
+  const chatBottom = React.useRef(null);
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const chatBoxColor = useColorModeValue("gray.100", "gray.800");
   const messageBoxColor = useColorModeValue("gray.50", "gray.900");
@@ -40,6 +41,9 @@ export const Chat: React.FC<ChatProps> = ({ socket }) => {
           },
         ])
       );
+      if (chatBottom) {
+        (chatBottom.current as any).scrollIntoView({ behavior: "smooth" });
+      }
     });
   }, [socket, messages]);
 
@@ -93,6 +97,7 @@ export const Chat: React.FC<ChatProps> = ({ socket }) => {
                   />
                 );
               })}
+              <div ref={chatBottom}></div>
             </Box>
             <Formik
               initialValues={{ message: "" }}
