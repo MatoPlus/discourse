@@ -20,11 +20,12 @@ export const JoinRoomPage: React.FC<JoinRoomPageProps> = ({ roomId, room }) => {
   const router = useRouter();
 
   return (
-    <Box m="auto">
+    <Box m="auto" maxW="50vw">
       <Heading mb={4} size="lg">
         {room.name}
       </Heading>
       <Text>{`Users: ${room.currentUsers.length}/${room.maxUsers}`}</Text>
+      <Text>{`Description: ${room.description}`}</Text>
       <Formik
         initialValues={{ password: "" }}
         onSubmit={async (values, { setErrors }) => {

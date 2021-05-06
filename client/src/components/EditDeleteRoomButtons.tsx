@@ -23,6 +23,7 @@ export const EditDeleteRoomButtons: React.FC<EditDeleteRoomButtonsProps> = ({
   const deleteRoomMutation = useMutation(deleteRoom, {
     onSuccess: () => {
       queryClient.invalidateQueries("rooms");
+      queryClient.invalidateQueries("room");
     },
   });
 
@@ -35,7 +36,7 @@ export const EditDeleteRoomButtons: React.FC<EditDeleteRoomButtonsProps> = ({
       <Link href="/rooms/edit/[id]" as={`/rooms/edit/${id}`}>
         <IconButton
           as={ChakraLink}
-          mr={4}
+          mr={2}
           icon={<EditIcon />}
           aria-label="Edit room"
           size="sm"

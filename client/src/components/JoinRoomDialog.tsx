@@ -7,6 +7,7 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
+  Text,
   useToast,
 } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
@@ -48,7 +49,8 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
         <AlertDialogHeader>{`Join "${room.name}"?`}</AlertDialogHeader>
         <AlertDialogCloseButton />
         <AlertDialogBody>
-          {`Users: ${room.currentUsers.length}/${room.maxUsers}`}
+          <Text>{`Users: ${room.currentUsers.length}/${room.maxUsers}`}</Text>
+          <Text>{`Description: ${room.description}`}</Text>
         </AlertDialogBody>
         <AlertDialogFooter m="auto">
           <Formik

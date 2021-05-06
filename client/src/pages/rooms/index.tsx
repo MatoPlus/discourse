@@ -24,6 +24,7 @@ import { JoinRoomDialog } from "../../components/JoinRoomDialog";
 export interface RoomProps {
   name: string;
   host: string;
+  description: string;
   maxUsers: number;
   currentUsers: [{ userId: string }?];
   content: string;
@@ -86,6 +87,7 @@ const Rooms = () => {
     _id: "",
     hasPassword: false,
     name: "",
+    description: "",
     maxUsers: 1,
     currentUsers: [],
     host: "",

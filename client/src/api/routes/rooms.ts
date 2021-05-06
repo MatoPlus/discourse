@@ -16,6 +16,7 @@ export const editRoom = (
   room: {
     name: string;
     maxUsers: number;
+    description: string;
     password?: string;
   }
 ) => axios.patch(`${path}/${id}`, room);
@@ -25,6 +26,7 @@ export const deleteRoom = (id: string) => axios.delete(`${path}/${id}`);
 export const createRoom = (room: {
   name: string;
   maxUsers: number;
+  description: string;
   password?: string;
 }) => axios.post(path, room);
 

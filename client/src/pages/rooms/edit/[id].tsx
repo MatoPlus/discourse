@@ -40,6 +40,7 @@ const EditRoom = () => {
           initialValues={{
             name: roomData?.data.name,
             maxUsers: roomData?.data.maxUsers,
+            description: "",
             password: "",
           }}
           onSubmit={async (values, { setErrors }) => {
@@ -68,6 +69,14 @@ const EditRoom = () => {
                   defaultValue={1}
                   min={1}
                   max={32}
+                />
+              </Box>
+              <Box mt={4}>
+                <InputField
+                  name="description"
+                  placeholder="description"
+                  label="Description"
+                  inputType="textarea"
                 />
               </Box>
               <Box mt={4}>

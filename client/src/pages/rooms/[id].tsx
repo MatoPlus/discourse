@@ -17,6 +17,7 @@ import {
 } from "../../api/routes/rooms";
 import { fetchMe } from "../../api/routes/users";
 import { Container } from "../../components/Container";
+import { EditDeleteRoomButtons } from "../../components/EditDeleteRoomButtons";
 import { Chat } from "../../components/rooms/Chat";
 import { JoinRoomPage } from "../../components/rooms/JoinRoomPage";
 import { codeMirrorModes } from "../../constants";
@@ -140,15 +141,10 @@ const Room = () => {
 
   if (isError) {
     return (
-      <Container>
-        <Flex
-          justifyContent="center"
-          alignItems="center"
-          height="100vh"
-          direction="column"
-        >
-          <Heading fontSize="6vw">Room Not Found</Heading>
-        </Flex>
+      <Container isCenter>
+        <Box m="auto">
+          <Heading fontSize="3xl">Room Not Found</Heading>
+        </Box>
       </Container>
     );
   }
@@ -174,9 +170,12 @@ const Room = () => {
     >
       <Box width="100%" px={3} pb={2}>
         <Flex justifyContent="flex-end" align="center" pb={2}>
-          <Heading px={3} size="md" mr="auto">
-            {room.name}
-          </Heading>
+          <Flex mr="auto" align="center">
+            <Heading px={3} size="md">
+              {room.name}
+            </Heading>
+            <EditDeleteRoomButtons creatorName={room.host} id={id} />
+          </Flex>
           <Text pr={2}>Language: </Text>
           <Select
             size="sm"

@@ -15,7 +15,12 @@ const CreateRoom = () => {
     <Container>
       <Box m="auto">
         <Formik
-          initialValues={{ name: "", maxUsers: 1, password: "" }}
+          initialValues={{
+            name: "",
+            maxUsers: 1,
+            description: "",
+            password: "",
+          }}
           onSubmit={async (values, { setErrors }) => {
             const { password, ...restValues } = values;
             const response = await createRoom({
@@ -41,6 +46,14 @@ const CreateRoom = () => {
                   defaultValue={1}
                   min={1}
                   max={32}
+                />
+              </Box>
+              <Box mt={4}>
+                <InputField
+                  name="description"
+                  placeholder="description"
+                  label="Description"
+                  inputType="textarea"
                 />
               </Box>
               <Box mt={4}>
