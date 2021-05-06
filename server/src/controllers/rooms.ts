@@ -9,11 +9,14 @@ import AuthRequest from "../types/AuthRequest";
 import RoomDocument from "../types/RoomDocument";
 
 export const getRooms = async (req: Request, res: Response) => {
+  const filter = req.query.filter as string;
   const page = parseInt(req.query.page as string) || 0;
   const recordsPerPage = parseInt(req.query.recordsPerPage as string);
   const recordsPerPageWithNextCheck = recordsPerPage + 1;
   try {
-    let rooms = await Room.find()
+    let rooms = await Room.find({
+      name: { $regex: filter || "", $options: "i" },
+    })
       .select({ hashedPassword: 0, content: 0 })
       .sort("-createdAt")
       .skip(page * recordsPerPage)
