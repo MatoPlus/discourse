@@ -67,7 +67,7 @@ export const Navigation: React.FC<NavigationProps> = ({ disableSticky }) => {
       <Flex flex={1} m="auto" align="center" maxW="60vw">
         <Link href="/">
           <ChakraLink>
-            <Heading>discourse</Heading>
+            <Heading>discourse.</Heading>
           </ChakraLink>
         </Link>
         <Box ml="auto">
