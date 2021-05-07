@@ -102,7 +102,7 @@ const Room = () => {
     if (editorRef.current) {
       setContent(roomData?.data.content);
     }
-  }, [roomData]);
+  }, [roomData, editorRef.current]);
 
   // Receiving boardcast from socket
   useEffect(() => {
@@ -158,7 +158,7 @@ const Room = () => {
 
     const wsProvider = new WebsocketProvider(
       process.env.NEXT_PUBLIC_SOCKET_URL as string,
-      id,
+      `discourse-room-${id}`,
       ydoc
     );
 
