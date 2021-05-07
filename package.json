@@ -8,7 +8,7 @@
     "postinstall": "npm run build",
     "build": "npm run build:server",
     "build:client": "(cd ./client && npm run build)",
-    "build:server": "(cd ./server && ./node_modules/.bin/tsc )",
+    "build:server": "(cd ./server && ./node_modules/.bin/tsc && PORT=3333 npx y-websocket-server & )",
     "start": "npm run start:prod",
     "start:prod": "(cd ./server && node dist/index.js)"
   },
