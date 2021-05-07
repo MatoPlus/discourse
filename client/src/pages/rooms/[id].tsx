@@ -98,11 +98,7 @@ const Room = () => {
     setRoom(roomData?.data);
     setLanguage(roomData?.data.mode);
     setDocLoaded(true);
-
-    if (editorRef.current) {
-      setContent(roomData?.data.content);
-    }
-  }, [roomData, editorRef.current]);
+  }, [roomData]);
 
   // Receiving boardcast from socket
   useEffect(() => {
@@ -253,7 +249,7 @@ const Room = () => {
         <CodeMirror
           editorDidMount={(editor) => (editorRef.current = editor)}
           onBeforeChange={(editor, data, value) => {
-            if (socket) {
+            if (socket && editorRef.current) {
               setContent(value);
             }
           }}
