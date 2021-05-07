@@ -13,7 +13,7 @@
 Code, collaborate, and chat together with discouse. The discourse platform
 offers real-time, cooperative code rooms. Choose from over 100 languages. Go beyond generic code sharing
 platforms, utilize powerful functionalities along with simple and
-intuitive interfaces. Try it out at https://discourse.vercel.app/. Make sure it give it a sec for the backend on heroku to wake up.
+intuitive interfaces. Try it out at https://discourse.vercel.app/. Make sure to give it couple seconds for the backend on heroku to wake up.
 
 ## Demo
 ![](demo/demo.gif)
@@ -67,7 +67,7 @@ CORS_ORIGIN=<url of client, allow API calls from client>
 
 ## Main Technologies
 - [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) - Persist rooms and users in the platform
-- [Yjs](https://docs.yjs.dev/) - Integrates CRDT (Conflict-free replicated data type) to prevent conflict issues
+- [Yjs](https://docs.yjs.dev/) - Integrates CRDT (Conflict-free replicated data type) to prevent conflict issues in code rooms
 - [Express.js](https://expressjs.com/) - Used to setup backend logic via REST API
 - [Socket.io](https://socket.io/) - Used sockets to implement real-time interactions between users
 - [Next.js](https://nextjs.org/) - Used to do deliver better server/client-side rendering, faster pages!
