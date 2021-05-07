@@ -36,7 +36,7 @@ const EditRoom = () => {
 
   const router = useRouter();
   return (
-    <Container>
+    <Container isCenter>
       <Box m="auto">
         <Formik
           initialValues={{
@@ -79,7 +79,7 @@ const EditRoom = () => {
                 <InputField
                   name="description"
                   placeholder="description"
-                  label="Description"
+                  label="Short Description"
                   inputType="textarea"
                 />
               </Box>

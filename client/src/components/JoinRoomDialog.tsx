@@ -49,8 +49,8 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
         <AlertDialogHeader>{`Join "${room.name}"?`}</AlertDialogHeader>
         <AlertDialogCloseButton />
         <AlertDialogBody>
-          <Text>{`Users: ${room.currentUsers.length}/${room.maxUsers}`}</Text>
-          <Text>{`Description: ${room.description}`}</Text>
+          <Text>Description: </Text>
+          <Text as="samp">{room.description}</Text>
         </AlertDialogBody>
         <AlertDialogFooter m="auto">
           <Formik
