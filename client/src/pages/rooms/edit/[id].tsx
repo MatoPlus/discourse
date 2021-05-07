@@ -3,7 +3,7 @@ import { Box } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { editRoom, fetchRoom } from "../../../api/routes/rooms";
 import { Container } from "../../../components/Container";
 import { InputField } from "../../../components/InputField";
@@ -17,6 +17,7 @@ const EditRoom = () => {
   useIsAuth();
   const id = useGetId();
   const toast = useToast();
+  const queryClient = useQueryClient();
   const { data: roomData, isLoading, isError } = useQuery(
     "room",
     () => fetchRoom(id as string),
@@ -41,7 +42,7 @@ const EditRoom = () => {
           initialValues={{
             name: roomData?.data.name,
             maxUsers: roomData?.data.maxUsers,
-            description: "",
+            description: roomData?.data.description,
             password: "",
           }}
           onSubmit={async (values, { setErrors }) => {
@@ -54,6 +55,8 @@ const EditRoom = () => {
               setErrors(getErrorMap(err.response.data.errors));
             });
             if (response && response.data) {
+              queryClient.invalidateQueries("room");
+              queryClient.invalidateQueries("verified");
               router.push("/rooms");
             }
           }}
