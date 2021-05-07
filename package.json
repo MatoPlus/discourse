@@ -5,10 +5,10 @@
   "scripts": {
     "install": "npm run install:server",
     "install:server": "(cd ./server && npm install)",
-    "postinstall": "(cd ./server && npx y-websocket-server &)",
-    "build": "(cd ./server && ./node_modules/.bin/tsc)",
+    "postinstall": "(cd ./server && PORT=1234 npx y-websocket-server &)",
+    "build": "echo noserverbuild",
     "start": "npm run start:prod",
-    "start:prod": "(cd ./server && node ./dist/index.ts)"
+    "start:prod": "(cd ./server && ./node_modules/.bin/tsc && node src/index.ts)"
   },
   "repository": {
     "type": "git",
