@@ -1,0 +1,16 @@
+{
+  "name": "discourse",
+  "version": "0.1.0",
+  "description": "Collaborate, code, and chat with discourse",
+  "scripts": {
+    "install": "npm run install:client && npm run install:server",
+    "install:server": "(cd ./server && npm install)",
+    "postinstall": "(cd ./server && npx y-websocket-server)",
+    "start": "npm run start:prod",
+    "start:prod": "(cd ./server && node ./dist/index.ts)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MatoPlus/discourse.git"
+  }
+}
