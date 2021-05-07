@@ -8,9 +8,9 @@
     "postinstall": "npm run build",
     "build": "npm run build:server",
     "build:client": "(cd ./client && npm run build)",
-    "build:server": "(cd ./server && ./node_modules/.bin/tsc && PORT=3333 npx y-websocket-server & )",
+    "build:server": "(cd ./server && ./node_modules/.bin/tsc)",
     "start": "npm run start:prod",
-    "start:prod": "(cd ./server && node dist/index.js)"
+    "start:prod": "(cd ./server && PORT=8080 npx y-websocket-server & cd ./server && node dist/index.js)"
   },
   "repository": {
     "type": "git",
