@@ -10,7 +10,7 @@
     "build:client": "(cd ./client && npm run build)",
     "build:server": "(cd ./server && ./node_modules/.bin/tsc)",
     "start": "npm run start:prod",
-    "start:prod": "(cd ./server && npx y-websocket-server)"
+    "start:prod": "(cd ./server && PORT=5000 npx y-websocket-server)"
   },
   "repository": {
     "type": "git",
