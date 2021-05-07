@@ -108,7 +108,11 @@ export const Chat: React.FC<ChatProps> = ({ socket }) => {
             >
               <Form>
                 <Flex align="center" pt={2}>
-                  <InputField name="message" placeholder="message" />
+                  <InputField
+                    name="message"
+                    placeholder="message"
+                    autoComplete="off"
+                  />
                   <Button colorScheme="teal" type="submit">
                     send
                   </Button>
