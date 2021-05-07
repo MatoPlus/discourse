@@ -5,7 +5,7 @@
   "scripts": {
     "install": "npm run install:server",
     "install:server": "(cd ./server && npm install)",
-    "postinstall": "(cd ./server && npx y-websocket-server)",
+    "postinstall": "(cd ./server && npx y-websocket-server &)",
     "start": "npm run start:prod",
     "start:prod": "(cd ./server && node ./dist/index.ts)"
   },
