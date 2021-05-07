@@ -6,6 +6,7 @@
     "install": "npm run install:server",
     "install:server": "(cd ./server && npm install)",
     "postinstall": "(cd ./server && npx y-websocket-server &)",
+    "build": "(cd ./server && ./node_modules/.bin/tsc)",
     "start": "npm run start:prod",
     "start:prod": "(cd ./server && node ./dist/index.ts)"
   },
