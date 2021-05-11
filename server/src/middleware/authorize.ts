@@ -10,7 +10,7 @@ export default function authorize(
 ) {
   const authorization = req.header("authorization");
   if (!authorization)
-    res.status(401).send({ errors: [new Status("User not logged in")] });
+    res.status(401).send({ errors: [new Status("Please login")] });
   else {
     try {
       // Following the bearer scheme
@@ -19,7 +19,7 @@ export default function authorize(
       req.user = verified;
       next();
     } catch (err) {
-      res.status(401).send({ errors: [new Status("Invalid Token")] });
+      res.status(401).send({ errors: [new Status("Please login")] });
     }
   }
 }
