@@ -102,7 +102,9 @@ export const Chat: React.FC<ChatProps> = ({ socket }) => {
             <Formik
               initialValues={{ message: "" }}
               onSubmit={(values, { setValues }) => {
-                socket.emit("send-chat-message", values.message);
+                if (values.message) {
+                  socket.emit("send-chat-message", values.message);
+                }
                 setValues({ message: "" });
               }}
             >
