@@ -25,6 +25,7 @@ const userSchema: Schema = new mongoose.Schema(
       trim: true,
       minlength: 6,
     },
+    // Watermark is used to keep track of JWT versions and revoking tokens
     refreshTokenWatermark: {
       type: Date,
       default: Date.now,

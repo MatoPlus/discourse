@@ -1,7 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import RoomDocument from "../types/RoomDocument";
 
-// Missing text and language setting
 const roomSchema: Schema = new mongoose.Schema(
   {
     host: {
