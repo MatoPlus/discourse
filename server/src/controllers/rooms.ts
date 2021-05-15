@@ -8,11 +8,20 @@ import { createRoomSchema } from "../schemas/schema";
 import AuthRequest from "../types/AuthRequest";
 import RoomDocument from "../types/RoomDocument";
 
+/**
+ * Get all rooms in database with pagination and filter, returning all
+ * public room fields and whether or not there is more rooms to be paginated
+ *
+ * @param req request containing filter and pagination options
+ * @param res
+ */
 export const getRooms = async (req: Request, res: Response) => {
   const filter = req.query.filter as string;
   const page = parseInt(req.query.page as string) || 0;
   const recordsPerPage = parseInt(req.query.recordsPerPage as string);
   const recordsPerPageWithNextCheck = recordsPerPage + 1;
+
+  // Get rooms paginated, filtered, and sorted by last created
   try {
     let rooms = await Room.find({
       name: { $regex: filter || "", $options: "i" },
@@ -30,6 +39,12 @@ export const getRooms = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Get room in database by id and return needed room fields
+ *
+ * @param req request containing room id as query param
+ * @param res
+ */
 export const getRoom = async (req: Request, res: Response) => {
   try {
     const room = await Room.findOne({ _id: req.params.id }).select({
@@ -50,8 +65,13 @@ export const getRoom = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Enter room in database by id and return needed room fields
+ *
+ * @param req request containing room id as query param and user to enter
+ * @param res
+ */
 export const enterRoom = async (req: AuthRequest, res: Response) => {
-  // Validate password here :)
   try {
     const room = await Room.findOne({ _id: req.params.id });
 
@@ -59,12 +79,14 @@ export const enterRoom = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ errors: [new Status("Room not found")] });
     }
 
+    // If user already in room, return room
     if (
       room.currentUsers.some((user) => user.userId === (req.user as any)._id)
     ) {
       return res.json(room);
     }
 
+    // Validate password if room has password
     if (room.hashedPassword) {
       const validPass = await argon2.verify(
         room.hashedPassword,
@@ -90,6 +112,12 @@ export const enterRoom = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Leave room in database by id and return user id
+ *
+ * @param req request containing room id as query param and user to leave
+ * @param res
+ */
 export const leaveRoom = async (req: AuthRequest, res: Response) => {
   try {
     await Room.findOneAndUpdate(
@@ -102,7 +130,14 @@ export const leaveRoom = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Create room in database and return room id
+ *
+ * @param req request containing createRoomSchema body and current user in access token
+ * @param res
+ */
 export const createRoom = async (req: AuthRequest, res: Response) => {
+  // Use Joi to validate request input
   const { error } = createRoomSchema.validate(req.body);
   if (error) {
     return res.status(409).json({
@@ -112,12 +147,14 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
     });
   }
 
+  // Find current user by access token and use as host of room
   const user = await User.findOne({ _id: (req.user as any)._id });
 
   if (!user) {
     return res.status(401).json({ message: "Current user not found" });
   }
 
+  // Create and save room
   try {
     const room: RoomDocument = new Room({
       host: user.username,
@@ -136,7 +173,14 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Edit room in database and return room id
+ *
+ * @param req request containing createRoomSchema body (also used for edits) and current user in access token
+ * @param res
+ */
 export const editRoom = async (req: AuthRequest, res: Response) => {
+  // Use Joi to validate input
   const { error } = createRoomSchema.validate(req.body);
   if (error) {
     return res.status(409).json({
@@ -164,6 +208,7 @@ export const editRoom = async (req: AuthRequest, res: Response) => {
       .json({ errors: [new Status("Cannot edit other user's room")] });
   }
 
+  // Update room using request
   try {
     room.name = req.body.name;
 
@@ -190,6 +235,12 @@ export const editRoom = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Delete room in database and return room id
+ *
+ * @param req request containing query param of room id and current user (access token)
+ * @param res
+ */
 export const deleteRoom = async (req: AuthRequest, res: Response) => {
   const user = await User.findOne({ _id: (req.user as any)._id });
 
@@ -209,6 +260,7 @@ export const deleteRoom = async (req: AuthRequest, res: Response) => {
       .json({ message: "User cannot delete other user's room" });
   }
 
+  // Delete room
   try {
     await Room.deleteOne({ _id: room.id });
     return res.status(200).json({ _id: room.id });
@@ -217,6 +269,12 @@ export const deleteRoom = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Verify user has access to room
+ *
+ * @param req request containing query param of room id and current user (access token)
+ * @param res
+ */
 export const verifyUser = async (req: AuthRequest, res: Response) => {
   try {
     const room = await Room.findOne({ _id: req.params.id });

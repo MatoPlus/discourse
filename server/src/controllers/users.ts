@@ -18,6 +18,12 @@ import {
 } from "../utils/tokens";
 import { sendEmail } from "../utils/sendEmail";
 
+/**
+ * Get the current user from access token if exists
+ *
+ * @param req request containing accesstoken
+ * @param res
+ */
 export const currentUser = async (req: AuthRequest, res: Response) => {
   const user = await User.findOne({ _id: (req.user as any)._id });
   if (!user) {
@@ -28,7 +34,14 @@ export const currentUser = async (req: AuthRequest, res: Response) => {
     .json({ _id: user._id, username: user.username, email: user.email });
 };
 
+/**
+ * Register/create user in database if body is valid
+ *
+ * @param req request containing body of registerUserSchema
+ * @param res
+ */
 export const registerUser = async (req: Request, res: Response) => {
+  // Use Joi to validate body and return errors if any
   const { error } = registerUserSchema.validate(req.body);
   if (error) {
     return res.status(409).json({
@@ -38,6 +51,7 @@ export const registerUser = async (req: Request, res: Response) => {
     });
   }
 
+  // Try to create and save user
   try {
     const user: UserDocument = new User({
       username: req.body.username,
@@ -59,7 +73,14 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Login as user by returning new refresh and access tokens for session
+ *
+ * @param req request containing login info containing user/email and password
+ * @param res
+ */
 export const loginUser = async (req: Request, res: Response) => {
+  // Try to find user by either user/email (same field in form)
   const user = await User.findOne({
     $or: [
       { email: req.body.usernameOrEmail },
@@ -75,6 +96,7 @@ export const loginUser = async (req: Request, res: Response) => {
     });
   }
 
+  // Verify password using argon
   const validPass = await argon2.verify(user.hashedPassword, req.body.password);
   if (!validPass)
     return res
@@ -89,12 +111,25 @@ export const loginUser = async (req: Request, res: Response) => {
   return res.send({ token: accessToken });
 };
 
+/**
+ * Logout by returning empty refresh token
+ *
+ * @param _
+ * @param res
+ */
 export const logoutUser = async (_: Request, res: Response) => {
   sendRefreshToken(res, "");
   res.json({ ok: true });
 };
 
+/**
+ * Recover user password by sending email to user with change password link
+ *
+ * @param req contains body for forgotPasswordSchema
+ * @param res
+ */
 export const recoverPassword = async (req: Request, res: Response) => {
+  // Use Joi to validate input for request
   const { error, value } = forgotPasswordSchema.validate(req.body);
   if (error) {
     return res.status(400).json({
@@ -103,6 +138,8 @@ export const recoverPassword = async (req: Request, res: Response) => {
       ),
     });
   }
+
+  // Get user and email and send email containing change password link if exists
   const email = value.email;
   const user = await User.findOne({ email: email });
 
@@ -115,10 +152,18 @@ export const recoverPassword = async (req: Request, res: Response) => {
     );
   }
 
+  // Return ok regardless to prevent brute force data mining
   return res.json({ ok: true });
 };
 
+/**
+ * Change password for user
+ *
+ * @param req contains body for changePasswordSchema
+ * @param res
+ */
 export const changePassword = async (req: Request, res: Response) => {
+  // Use Joi to validate input
   const { error, value } = changePasswordSchema.validate(req.body);
   if (error) {
     return res.status(400).json({
@@ -130,6 +175,7 @@ export const changePassword = async (req: Request, res: Response) => {
   const password = value.password;
   const recoverToken = req.params.token;
 
+  // Validate that recover token is valid and use userId in token to change password
   let userId = -1;
   try {
     const verified = jwt.verify(recoverToken, process.env.RECOVER_JWT_SECRET);

@@ -4,8 +4,15 @@ import { createAccessToken, createRefreshToken } from "../utils/tokens";
 import { sendRefreshToken } from "../utils/response";
 import User from "../models/user";
 
+/**
+ * Refresh the access token using the refresh token in cookies
+ *
+ * @param req contains refresh token cookie
+ * @param res
+ */
 export const refreshAccessToken = async (req: Request, res: Response) => {
   const refreshToken = req.cookies.rtkn;
+
   if (!refreshToken) {
     return res.send({ ok: false, accessToken: "" });
   }
@@ -17,6 +24,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     return res.send({ ok: false, accessToken: "" });
   }
 
+  // Try to get user with expected token watermark/versions
   const user = await User.findOne({
     _id: payload._id,
     refreshTokenWatermark: payload.tokenWatermark,
@@ -28,6 +36,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
   // Update expiry of refresh token
   sendRefreshToken(res, createRefreshToken(user));
 
+  // Return refreshed access token in response
   return res.send({ ok: true, accessToken: createAccessToken(user) });
 };
 
