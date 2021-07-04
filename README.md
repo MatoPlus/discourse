@@ -23,8 +23,9 @@ intuitive interfaces. Try it out at https://discourse.vercel.app/. Make sure to 
 ```bash
 git clone https://github.com/MatoPlus/discourse
 cd discourse
-cd server && cd npm i
-cd ../client && npm i
+cd server && npm i
+cd ..
+cd client && npm i
 ```
 
 ## Running the app for development
